@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+    integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="auth.js"></script>
+  <link rel="icon" type="image/x-icon" href="logos/favicon2.png">
+</head>
+
+<body>
+  <span id="username-display" class="username-ellipse"></span>
+
+  <!-- TOPNAV -->
+  <div class="topnav">
+    <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo"></a>
+    <div class="nav-links">
+      <div class="topnav-left">
+        <a class="page" href="map.html">Map</a>
+        <a class="page" href="database.html">Database</a>
+        <a class="page" href="contribute.html">Contribute</a>
+        <a class="page" href="about.html">About</a>
+        <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+      </div>
+      <div class="topnav-right">
+        <div id="topnav-auth">
+          <a class="page" href="login.html" id="login-link">Login</a>
+        </div>
+        <a class="page" href="forum.html">Forum</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="contributecontent">
+    <h2>Database</h2>
+
+    <div class="database-container">
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <div>
+          <label for="yearRange">
+            Filter by year: <span id="rangeLabel">Before 1900</span>
+          </label><br>
+          <input type="range" id="yearRange" min="1830" max="1930" value="1900" step="1" style="width: 300px;">
+        </div>
+
+        <label class="checkbox-container">
+          <input type="checkbox" id="includeUndated" style="margin-right: 0.5rem">
+          Include undated
+        </label>
+
+        <label class="checkbox-container">
+          <input type="checkbox" id="nearestCheckbox" style="margin-right: 0.5rem"/>
+          Sort by nearest to me
+        </label>
+
+        <div style="flex-grow: 1;"></div>
+
+        <!-- 🔽 Compact uploader filter -->
+        <div id="uploader-filter" class="uploader-filter">
+          <label for="uploaderInput" style="margin-right: 0.3rem;">Filter by uploader:</label>
+          <input type="text" id="uploaderInput" placeholder="Username">
+        </div>
+
+        <label class="checkbox-container">
+          <input type="checkbox" id="showMeta" style="margin-right: 0.5rem">
+          Show meta
+        </label>
+      </div>
+
+      <!-- TABLE -->
+      <table id="records-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Photo</th>
+            <th>Date</th>
+            <th>Caption</th>
+            <th>Source</th>
+            <th>Photographer</th>
+            <th>Coordinates</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- Image Modal -->
+  <div id="imageModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="modalImage" alt="Full size photo">
+  </div>
+
+  <script type="module">
+    import { API_BASE_URL } from './config.js';
+
+    let initialUploaderApplied = false;
+    let allRecords = [];
+    let highlightApplied = false;
+    let userLocation = null;
+    let sortByNearest = false;
+
+    const uploaderFilter = document.getElementById('uploader-filter');
+    const uploaderInput = document.getElementById('uploaderInput');
+    const showMetaCheckbox = document.getElementById('showMeta');
+
+    function escapeHtml(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function isSafeHttpUrl(u) {
+      try {
+        const url = new URL(u);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    }
+
+    function buildSafeUserLink(username) {
+      // Your server validates usernames like /^[a-zA-Z0-9_]{3,30}$/
+      // If username fails, don't create a clickable link.
+      const u = String(username ?? '');
+      const ok = /^[a-zA-Z0-9_]{3,30}$/.test(u);
+      if (!ok) return escapeHtml(u) || 'N/A';
+
+      // IMPORTANT: link to same origin user page, not API_BASE_URL (prevents mixed-origin issues)
+      return `<a href="/user/${encodeURIComponent(u)}">@${escapeHtml(u)}</a>`;
+    }
+
+    function getDistance(lat1, lng1, lat2, lng2) {
+      const toRad = x => x * Math.PI / 180;
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function getQueryId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    function getQueryUploader() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('uploader');
+    }
+
+    async function loadApprovedRecords() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/submissions/approved`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allRecords = await res.json();
+
+        // Adjust filter for query ID
+        const queryId = getQueryId();
+        if (queryId) {
+          const record = allRecords.find(r => String(r.id) === queryId);
+          if (record) {
+            const yearRange = document.getElementById('yearRange');
+            const rangeLabel = document.getElementById('rangeLabel');
+            const includeUndated = document.getElementById('includeUndated');
+
+            if (record.year) {
+              if (parseInt(yearRange.value, 10) < record.year) {
+                yearRange.value = record.year;
+                rangeLabel.textContent = record.year < 1900 ? `Before ${record.year}` : `Up to ${record.year}`;
+              }
+              includeUndated.checked = false;
+            } else {
+              includeUndated.checked = true;
+            }
+          }
+        }
+
+        renderTable();
+      } catch (err) {
+        console.error('Failed to load records:', err);
+      }
+    }
+
+    function renderTable() {
+      const metaVisible = showMetaCheckbox.checked;
+      const table = document.getElementById('records-table');
+
+      if (metaVisible) table.classList.add('meta-visible');
+      else table.classList.remove('meta-visible');
+
+      // Update table header
+      const theadRow = document.querySelector('#records-table thead tr');
+      theadRow.innerHTML = `
+        <th>ID</th>
+        <th>Photo</th>
+        <th>Date</th>
+        <th>Caption</th>
+        <th>Source</th>
+        <th>Photographer</th>
+        <th>Coordinates</th>
+        ${metaVisible
+          ? '<th class="notes-column">Research notes</th><th class="uploader-column">Uploader</th><th class="uploaded-column">Date uploaded</th>'
+          : ''
+        }
+      `;
+
+      const maxYear = parseInt(document.getElementById('yearRange').value, 10);
+      const includeUndated = document.getElementById('includeUndated').checked;
+      const tbody = document.querySelector('#records-table tbody');
+      const targetId = getQueryId();
+      tbody.innerHTML = '';
+
+      let filtered = allRecords.filter(record => {
+        if (record.year && record.year <= maxYear) return true;
+        if (!record.year && includeUndated) return true;
+        return false;
+      });
+
+      if (sortByNearest && userLocation) {
+        filtered = filtered.filter(r => r.lat && r.lng);
+        filtered.sort((a, b) => {
+          const distA = getDistance(userLocation.lat, userLocation.lng, a.lat, a.lng);
+          const distB = getDistance(userLocation.lat, userLocation.lng, b.lat, b.lng);
+          return distA - distB;
+        });
+      } else {
+        filtered.sort((a, b) => {
+          if (a.year && b.year) {
+            if (a.year !== b.year) return a.year - b.year;
+            if (a.month && b.month && a.month !== b.month) return a.month - b.month;
+            if (a.day && b.day && a.day !== b.day) return a.day - b.day;
+            return 0;
+          }
+          if (a.year && !b.year) return -1;
+          if (!a.year && b.year) return 1;
+          return 0;
+        });
+      }
+
+      let uploaderFilterValue = uploaderInput?.value?.trim().toLowerCase() || null;
+
+      if (!initialUploaderApplied && !uploaderFilterValue) {
+        const queryUploader = getQueryUploader();
+        if (queryUploader) uploaderFilterValue = queryUploader.toLowerCase();
+      }
+
+      if (uploaderFilterValue) {
+        filtered = filtered.filter(r =>
+          r.user_id && String(r.user_id).toLowerCase().includes(uploaderFilterValue)
+        );
+      }
+
+      filtered.forEach(record => {
+        const {
+          id, caption, source, photographer, year, month, day, estimated,
+          lat, lng, notes, photo_url, created_at, user_id
+        } = record;
+
+        // Format original date taken
+        let dateStr = '';
+        if (year) {
+          dateStr = `${year}`;
+          if (month) {
+            const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
+            dateStr = `${monthName} ${year}`;
+            if (day) dateStr = `${monthName} ${day}, ${year}`;
+          }
+        }
+        const formattedDate = dateStr ? (estimated ? `c. ${dateStr}` : dateStr) : 'Undated';
+
+        // Format uploaded date
+        const uploadedDate = created_at ? new Date(created_at).toLocaleString() : 'N/A';
+
+        // Coords link (safe numeric formatting)
+        const coords = (typeof lat === 'number' && typeof lng === 'number')
+          ? `<a href="map.html?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&id=${encodeURIComponent(id)}" style="color: inherit; text-decoration: underline;">${lat.toFixed(5)}, ${lng.toFixed(5)}</a>`
+          : 'N/A';
+
+        // Photo URL: only allow http(s). If it isn't, don't render as <img src="...">
+        const safePhotoUrl = (photo_url && isSafeHttpUrl(photo_url)) ? photo_url : '';
+
+        const row = document.createElement('tr');
+
+        // IMPORTANT: no raw HTML from DB fields (caption/source/etc)
+        const safeCaption = escapeHtml(caption || 'No caption provided');
+        const safeSource = escapeHtml(source || 'N/A');
+        const safePhotographer = escapeHtml(photographer || 'N/A');
+        const safeNotes = escapeHtml(notes || '');
+
+        const uploaderCell = user_id ? buildSafeUserLink(user_id) : 'N/A';
+
+        row.innerHTML = `
+          <td>[${escapeHtml(id)}]</td>
+          <td>
+            ${safePhotoUrl
+              ? `<img src="${safePhotoUrl}" alt="Photo" style="max-width: 100px; border-radius: 4px;">`
+              : `<span>N/A</span>`
+            }
+          </td>
+          <td>${escapeHtml(formattedDate)}</td>
+          <td>${safeCaption}</td>
+          <td>${safeSource}</td>
+          <td>${safePhotographer}</td>
+          <td>${coords}</td>
+          ${metaVisible ? `<td class="notes-column">${safeNotes}</td>` : ''}
+          ${metaVisible ? `<td class="uploader-column">${uploaderCell}</td>` : ''}
+          ${metaVisible ? `<td class="uploaded-column">${escapeHtml(uploadedDate)}</td>` : ''}
+        `;
+
+        if (String(id) === targetId && !highlightApplied) {
+          row.classList.add('highlighted-row');
+          setTimeout(() => row.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+          setTimeout(() => row.classList.add('fade-out'), 250);
+          setTimeout(() => {
+            row.classList.remove('highlighted-row', 'fade-out');
+            highlightApplied = true;
+          }, 500);
+        }
+
+        tbody.appendChild(row);
+
+        const img = row.querySelector('img');
+        if (img) {
+          img.style.cursor = 'zoom-in';
+          img.addEventListener('click', () => {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = img.src;
+          });
+        }
+      });
+
+      initialUploaderApplied = true;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadApprovedRecords();
+
+      const queryUploader = getQueryUploader();
+      if (queryUploader) {
+        const yearRange = document.getElementById('yearRange');
+        const includeUndated = document.getElementById('includeUndated');
+        const rangeLabel = document.getElementById('rangeLabel');
+
+        yearRange.value = 1930;
+        rangeLabel.textContent = "Up to 1930";
+
+        includeUndated.checked = true;
+
+        showMetaCheckbox.checked = true;
+        uploaderFilter.classList.add('show');
+
+        uploaderInput.value = queryUploader;
+
+        renderTable();
+      }
+
+      const rangeInput = document.getElementById('yearRange');
+      const rangeLabel = document.getElementById('rangeLabel');
+      const includeUndated = document.getElementById('includeUndated');
+      const nearestCheckbox = document.getElementById('nearestCheckbox');
+
+      rangeInput.addEventListener('input', () => {
+        const val = parseInt(rangeInput.value, 10);
+        rangeLabel.textContent = val < 1900 ? `Before ${val}` : `Up to ${val}`;
+        renderTable();
+      });
+
+      includeUndated.addEventListener('change', () => {
+        renderTable();
+      });
+
+      nearestCheckbox.addEventListener('change', () => {
+        if (nearestCheckbox.checked) {
+          if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            nearestCheckbox.checked = false;
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(position => {
+            userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            sortByNearest = true;
+            renderTable();
+          }, () => {
+            alert('Unable to retrieve your location.');
+            nearestCheckbox.checked = false;
+            sortByNearest = false;
+          });
+        } else {
+          sortByNearest = false;
+          renderTable();
+        }
+      });
+
+      // Modal close handlers
+      document.querySelector('.close').onclick = function () {
+        document.getElementById('imageModal').style.display = 'none';
+      };
+      window.onclick = function (e) {
+        const modal = document.getElementById('imageModal');
+        if (e.target === modal) modal.style.display = 'none';
+      };
+
+      showMetaCheckbox.addEventListener('change', () => {
+        const visible = showMetaCheckbox.checked;
+
+        if (visible) {
+          uploaderFilter.classList.add('show');
+        } else {
+          uploaderFilter.classList.remove('show');
+          uploaderInput.value = "";
+        }
+
+        renderTable();
+      });
+
+      uploaderInput?.addEventListener('input', () => {
+        renderTable();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1495 @@
+/* Inter for headings / buttons on front and about page */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+a {
+  color: inherit; /* eliminates blue hyperlinks */
+}
+
+/* TOPNAV */
+
+.topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 11px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  height: 40px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.topnav-left {
+  display: flex;
+  gap: 8px;
+}
+
+.topnav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* spacing between Login & Users & Forum */
+}
+
+.logo,
+.logo2 {
+  height: 30px;
+  width: auto;
+  margin-left: 6px;
+  margin-right: 4px;
+  padding-top: 4px;
+}
+
+.topnav a.page {
+  color: #000000;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 10px 12px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* LOGIN/LOGOUT BOX */
+
+/* Topnav auth container */
+#topnav-auth {
+  opacity: 0;                  /* hidden by default */
+  transition: opacity 0.3s ease;
+  display: inline-block;
+}
+
+#topnav-auth.visible {
+  opacity: 1;                  /* fade in when ready */
+}
+
+#topnav-auth a {
+  text-decoration: none;
+  font-weight: 400;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+#topnav-auth a.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+#topnav-auth a:hover {
+  text-decoration: underline;
+  color: #007BFF;
+}
+
+/* USERNAME BOX */
+.username-ellipse {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.65);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  cursor: pointer;
+  user-select: none;
+  z-index: 10000;
+  display: inline-block;
+  text-decoration: none;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+
+  opacity: 0;              /* fully hidden by default */
+  visibility: hidden;      /* prevent awkward empty box */
+  transition: opacity 0.4s ease;
+}
+
+.username-ellipse.visible {
+  opacity: 0.75; 
+  visibility: visible;     /* reveal smoothly */
+}
+
+.username-ellipse:hover {
+  background: rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.95);
+}
+
+.username-ellipse a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* FOOTER */
+
+.footer {
+  height:50px;
+  display: flex;
+  align-items: center; /* vertical align */
+  overflow: hidden;
+}
+
+.contact {
+  margin-left: 15px;
+}
+
+.contact a {
+  text-decoration: none;
+  color: rgb(26, 26, 26);
+}
+
+.legend {
+  margin-right: 30px;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.footer img {
+  width:12px;
+}
+
+/* FRONT PAGE */
+
+.front {
+  min-height: 100vh; /* puts footer at bottom */
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  color: #333;
+  background-color: #ffffff; /* Slightly lighter than before */
+  margin: 0;
+  padding: 0;
+}
+
+.frontcontent {
+  flex: 1;
+  padding: 0px 40px 60px 60px;
+  max-width: 800px; /* slightly wider */
+  margin: 0 auto;
+  background: transparent; /* remove white box */
+}
+
+.frontcontent h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgb(234, 234, 234);
+  color: #333;
+  padding-bottom: 10px;
+  font-family: 'Playfair Display', serif;
+}
+
+.frontcontent p { 
+  text-align: center;
+}
+
+.frontcontent p.caption1 {
+  font-size: 21px;
+  margin-bottom: 55px;
+  color: rgb(53, 53, 53);
+}
+
+.frontcontent p.caption2 {
+  font-size: 24px;
+  margin-top: 50px;
+  margin-bottom: 25px;
+}
+
+.frontcontent p.caption3 {
+  font-size: 25px;
+  margin-top: 20px;
+}
+
+.frontcontent p.caption4 {
+  margin-top: 90px;
+  font-size: 24px;
+  margin-bottom: 40px;
+}
+
+.minimapcontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.minimap {
+  height: 600px;
+  width: 800px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.minimap p { 
+  text-align: left;
+}
+
+.buttondiv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 35px;
+  margin-bottom: 25px;
+}
+
+.buttondiv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 35px;
+  margin-bottom: 25px;
+}
+
+.button:not(.collapsible) {
+  font-family: 'Inter', sans-serif;
+  border: 2px solid #b0c4de; /* soft outline color */
+  border-radius: 14px;
+  width: 200px;
+  height: 60px;
+  font-size: 20px;
+  font-weight: 500;
+  background: #ffffff; /* same as page */
+  color: #1a1a1a;
+  cursor: pointer;
+  box-shadow: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.1s ease;
+  will-change: transform;
+}
+
+.button:hover {
+  border-color: #7aa7d9; /* slightly stronger on hover */
+  background: #f8fbff; /* subtle hover effect */
+  transform: scale(1.02);
+}
+
+.button:active {
+  background: #f0f7ff; /* even more subtle tint */
+  transform: scale(0.98);
+}
+
+.logodiv {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: 35px;
+}
+
+.logodiv img {
+  width: 315px;
+}
+
+.footerfront {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 20px 0;   /* increased padding for vertical space */
+  margin-top: auto;
+  font-size: 0.95rem;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.footerfront p {
+  margin: 8px 0;    /* extra margin above & below */
+}
+
+/* --- ABOUT --- */
+
+.title {
+  margin-bottom: 0px;
+  font-size: 30px;
+}
+
+.prose {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+}
+
+li p.prose {
+  margin-top: 0;
+  margin-bottom: 0.5rem; /* or 0 if you want minimal spacing */
+}
+
+/* --- CONTRIBUTE --- */
+
+.contributecontent {
+  margin-top: 20px;
+  margin-left: 30px;
+  margin-right: 50px;
+  margin-bottom: 30px;
+  font-family: sans-serif;
+}
+
+.contributecontent h2 {
+  font-size: 2em;
+  margin-bottom: 10px;
+  font-family: sans-serif;
+}
+
+.contributecontent p {
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 700px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- FORM CONTAINER --- */
+form {
+  max-width: 700px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #f9f9f9;
+  box-shadow: -3px 0 6px -4px rgba(0, 0, 0, 0.15),
+              3px 0 6px -4px rgba(0, 0, 0, 0.15);
+  font-family: inherit;
+}
+
+/* --- FIELDSETS & LEGENDS --- */
+fieldset {
+  border: none;
+  margin-bottom: 20px;
+  padding: 0;
+}
+
+legend {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.legend-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* --- LABELS --- */
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+label[for="photographer"],
+label:has(+ #year) {
+  padding-bottom: 3px; /* Slight padding for consistency */
+}
+
+/* --- INPUTS, TEXTAREAS, SELECTS --- */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="url"],
+input[type="file"],
+textarea,
+select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+input[type="file"] {
+  padding: 5px;
+}
+
+input[type="url"],
+select {
+  font-size: 0.9rem;
+  border-radius: 3px;
+}
+
+input[type="url"]:focus,
+select:focus {
+  border-color: #333;
+  outline: none;
+}
+
+/* --- CHECKBOXES --- */
+.checkbox-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.checkbox-row label {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+/* --- NOTE BELOW DATE --- */
+#unknownDateNote {
+  display: none;
+  margin: 6px 0 0;
+  color: #444;
+  font-size: 0.9em;
+}
+
+/* --- BUTTONS --- */
+button[type="submit"],
+#form-help-modal button {
+  background-color: #333;
+  color: white;
+  font-weight: bold;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+
+button[type="submit"]:hover,
+#form-help-modal button:hover {
+  background-color: #555;
+}
+
+/* --- REQUIRED ASTERISK --- */
+.required {
+  color: red;
+}
+
+/* --- COORDINATE HELP LINK --- */
+.coord-help {
+  font-size: 0.9rem;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* --- HELP MODAL --- */
+#form-help-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+#form-help-modal {
+  display: none;
+  position: fixed;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 20px 18px;
+  border: 1px solid #aaa;
+  max-width: 420px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+#form-help-modal h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+#form-help-modal p {
+  margin: 10px 0;
+  line-height: 1.4;
+}
+
+/* --- DROP AREA (UPLOAD) --- */
+.drop-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #aaa;
+  border-radius: 8px;
+  padding: 2rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.drop-area:hover {
+  border-color: #333;
+  background-color: #f9f9f9;
+}
+
+.drop-area.dragover {
+  border-color: #0066cc;
+  background-color: #eef6ff;
+}
+
+.drop-area .subtext {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* --- IMAGE PREVIEW --- */
+#preview {
+  display: none;
+  margin-top: 1rem;
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  object-fit: contain;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* --- DATABASE --- */
+
+.databasecontent {
+  margin-top: 30px;
+  margin-left: 30px;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+}
+
+/* --- ADMIN --- */
+
+body.admin {
+  font-family: sans-serif;
+}
+
+p.admin {
+  font-size: 25px;
+  color: rgb(45, 45, 45);
+}
+
+hr.top {
+  margin-bottom: 30px;
+}
+
+.submission { /* text */
+  margin-bottom: 2rem;
+}
+
+img.admin {
+  border: 1px solid #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Flex row for label and input */
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* spacing between label and input */
+  margin-top: 1rem;
+}
+
+/* Input for Record ID */
+#delete-id {
+  width: 55px;
+  padding: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Textarea styling */
+#delete-reason {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  width: 440px;
+}
+
+/* Delete button styling */
+#delete-record-btn {
+  background-color: #c0392b;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#delete-record-btn:hover {
+  background-color: #a93226;
+}
+
+/* Status message */
+#delete-status {
+  margin-top: 1rem;
+}
+
+/* Admin logs */
+
+.admin-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.admin-log-table th,
+.admin-log-table td {
+  border-bottom: 1px solid #ddd;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.admin-log-table th {
+  font-weight: bold;
+}
+
+.action-approve {
+  color: green;
+  font-weight: bold;
+}
+
+.action-reject {
+  color: red;
+  font-weight: bold;
+}
+
+.action-delete {
+  color: #555;
+  font-weight: bold;
+}
+
+.admin-user-link {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+}
+
+.admin-user-link:hover {
+  text-decoration: underline;
+}
+
+#admin-logs {
+  padding-bottom: 6rem;
+}
+
+/* --- MAP --- */
+
+body.map {
+  overflow: hidden;
+  color: #333;
+  background-color: #f4f4f4;
+  font-family: 'Inter', sans-serif;
+}
+
+.mainmap {
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove any padding */
+  height: calc(100vh - 100px);
+}
+
+/* --- POP UP --- */
+
+.leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  max-width: 280px; /* match with JS */
+  overflow: hidden;
+}
+
+/* Triangle below popup */
+.leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.leaflet-popup-tip-container {
+  margin-top: -3px;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Popup content */
+.leaflet-popup-content {
+  margin: 0;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 6px 8px;
+  font-family: 'Lucida Sans', sans-serif;
+  font-size: 13px; /* was 12px */
+  line-height: 1.4; /* was 1.3 */
+  max-width: 260px; /* match width increase */
+}
+
+/* Title styling */
+.leaflet-popup-content-wrapper h3 {
+  font-size: 15px; /* was 14px */
+  margin: 0 0 6px 0;
+}
+
+/* Image constraints */
+.leaflet-popup-content-wrapper img:not(.arrow) {
+  width: 260px; /* was 250px */
+  max-width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Wrap long words */
+.leaflet-popup-content-wrapper p {
+  margin-top: -8px;
+  max-width: 270px; /* match new width */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-size: 14px;
+}
+
+.easy-button-button {
+  display: block !important;
+}
+
+.tag-filter-tags-container {
+  left: 30px;
+}
+
+/* Caption styling */
+.caption-container p.caption {
+  margin: 0 0 2px 0;
+}
+
+/* Show more/less toggle */
+.show-more-toggle {
+  display: inline;
+  margin-left: 4px;
+  color: #0078a8;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+}
+
+/* Source toggle */
+.source-toggle {
+  display: inline-block;
+  font-size: 12px;
+  color: #0078a8;
+  cursor: pointer;
+  user-select: none;
+}
+
+.source-toggle:hover {
+  text-decoration: underline;
+}
+
+/* Source details content */
+.source-details {
+  margin: 4px 0 0 2px;
+  font-size: 14px;
+  color: #34495e;
+}
+
+.source-details p {
+  margin: 2px 0 !important;
+  padding: 0;
+  font-size: 13px;
+  color: #34495e;
+}
+
+.caption-container {
+  margin-bottom: 6px;
+}
+
+/* --- DATABASE --- */
+
+.database-container {
+  padding: 0 1rem 1rem 0;
+  overflow-x: auto;
+}
+
+#records-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+#records-table th,
+#records-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+#records-table img {
+  max-width: 120px;
+  border-radius: 4px;
+}
+
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  padding-top: 60px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.85);
+}
+
+.modal-content {
+  display: block;
+  margin: auto;
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: 6px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+.close {
+  position: absolute;
+  top: 30px;
+  right: 45px;
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Slider */
+
+input[type="range"] {
+  -webkit-appearance: none; /* Remove default styling */
+  width: 100%;
+  height: 6px;
+  background: #444;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Track on hover */
+input[type="range"]:hover {
+  background: #555;
+}
+
+/* WebKit (Chrome, Safari) thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #aaa;
+  border: none;
+  box-shadow: 0 0 2px #000;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #ddd;
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #aaa;
+  border: none;
+  box-shadow: 0 0 2px #000;
+}
+input[type="range"]::-moz-range-thumb:hover {
+  background: #ddd;
+}
+
+/* IE */
+input[type="range"]::-ms-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #aaa;
+  border: none;
+  box-shadow: 0 0 2px #000;
+}
+input[type="range"]::-ms-thumb:hover {
+  background: #ddd;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center; /* Centers all filter bar items vertically */
+  gap: 1rem;
+  flex-wrap: wrap; /* Optional: prevents overflow on smaller screens */
+  margin-bottom: 0.75rem;
+}
+
+.uploader-filter {
+  display: none; /* hidden by default */
+  align-items: center; /* vertically align label + input */
+  gap: 0.3rem;
+  margin: 0; /* no margin at all */
+  transform: translateY(15px); /* shift down to match checkboxes */
+}
+
+.uploader-filter.show {
+  display: flex; /* show as flex when 'show' class is added */
+}
+
+.uploader-filter label {
+  display: inline-block;
+  margin-top: 15px; /* shift text down */
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.uploader-filter input {
+  position: static;       /* remove absolute positioning */
+  width: 110px;           /* smaller width */
+  height: 25px;
+  padding: 0.25rem 0.4rem;
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  /* translate down without affecting layout */
+  transform: translateY(4px);
+}
+
+.uploader-filter input:focus {
+  outline: none;
+  border-color: #888;
+  box-shadow: 0 0 3px rgba(0,0,0,0.2);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-top: 45px;
+  margin-left: 15px;
+}
+
+input[type="checkbox"] {
+  accent-color: #aaa; /* same as slider thumb base color */
+  cursor: pointer;
+}
+
+input[type="checkbox"]:hover {
+  accent-color: #ddd; /* lighten on hover like slider thumb */
+}
+
+.highlighted-row {
+  background-color: #ffffcc;
+  transition: background-color 1s ease;
+}
+
+.highlighted-row.fade-out {
+  background-color: transparent;
+}
+
+/* Default: hide meta columns */
+th.notes-column,
+td.notes-column,
+th.uploader-column,
+td.uploader-column {
+  display: none;
+}
+
+/* When meta is enabled */
+.meta-visible th.notes-column,
+.meta-visible td.notes-column,
+.meta-visible th.uploader-column,
+.meta-visible td.uploader-column {
+  display: table-cell;
+}
+
+/* --- FORUM --- */
+
+.forumcontent {
+  flex-grow: 1;
+  padding: 20px 30px;
+  margin: 0;
+  max-width: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+.main-forum-layout {
+  display: flex;
+  min-height: 100%;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Vertical tabs container */
+.vertical-tabs {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  border-right: 1px solid #ddd;
+  background-color: #f9f9f9;
+  padding-top: 20px;
+  box-sizing: border-box;
+}
+
+/* Each tab */
+.vertical-tabs .tab {
+  display: block;
+  padding: 12px 20px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 600;
+  border-left: 4px solid transparent;
+  transition: background-color 0.3s ease, border-left-color 0.3s ease;
+  cursor: pointer;
+}
+
+/* Active tab style */
+.vertical-tabs .tab.active,
+.vertical-tabs .tab[aria-selected="true"] {
+  background-color: #fff;
+  border-left-color: #007BFF; /* Blue highlight */
+  color: #007BFF;
+  font-weight: 700;
+}
+
+/* Hover effect for tabs */
+.vertical-tabs .tab:hover:not(.active) {
+  background-color: #e6f0ff;
+  color: #0056b3;
+}
+
+/* Login link (above tabs) */
+.login-link {
+  padding: 0 20px 15px 25px; /* match tab spacing but simpler */
+}
+
+.login-link a {
+  color: #333;               /* grey text */
+  font-size: 16px;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+  color: #222;               /* slightly darker on hover */
+}
+
+/* User link in vertical navbar */
+
+#user-link-container {
+  opacity: 0;           /* start hidden */
+  transition: opacity 0.3s ease;
+}
+#user-link-container.visible {
+  opacity: 1;           /* fade in once ready */
+}
+
+#user-link-container a {
+  display: inline-block;
+  color: #333;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 400;
+  transition: opacity 0.3s ease, color 0.3s ease;
+  opacity: 1;
+  margin-right: 0.3em;
+}
+
+#user-link-container a:hover {
+  text-decoration: underline;
+  color: #007BFF;
+}
+
+
+#user-link-container a.fade-out {
+  opacity: 0;
+}
+
+#user-link-container a.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+#user-link-container a:hover {
+  text-decoration: underline;
+  color: #007BFF;
+}
+
+/* --- USER PROFILE --- */
+/* full-width header block that contains centered inner content */
+.profile-header {
+  position: relative;          /* needed for the pseudo-element line */
+  width: 100%;
+  padding-bottom: 18px;       /* space between content and the line */
+  margin-bottom: 22px;        /* space below the line */
+  box-sizing: border-box;
+}
+
+/* inner container is centered and keeps the avatar + info stacked vertically */
+.profile-header-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  max-width: 100%;
+  margin: 0 auto;             /* safe center in the content area */
+}
+
+/* the horizontal rule that stretches across the content area
+   (it honors forumcontent padding because header sits inside forumcontent) */
+.profile-header::after {
+  content: "";
+  position: absolute;
+  left: 0;                    /* start at the inner left edge of the content area */
+  right: 0;                   /* end at the inner right edge of the content area */
+  bottom: 0;
+  height: 1px;
+  background: #e6e6e6;
+  pointer-events: none;
+}
+
+/* avatar & info (unchanged except kept inside inner wrapper) */
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #0073e6;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.profile-info h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+/* Add slight padding/margin above the "Joined" date */
+.profile-info .profile-meta:first-of-type {
+  margin-top: 12px; /* adjust as needed for spacing */
+}
+
+.profile-meta {
+  margin: 3px 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #0073e6; /* 🔵 blue background restored */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+/* Profile text slightly smaller */
+.profile-info h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.profile-meta {
+  margin: 3px 0;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Bio section */
+.profile-bio {
+  margin-bottom: 40px;
+}
+
+.profile-bio h3 {
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+.profile-bio p {
+  line-height: 1.6;
+  color: #333;
+  font-size: 18px;
+}
+
+/* Edit bio */
+.edit-bio textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 18px;
+  resize: vertical;
+}
+
+.btn {
+  background: #0073e6;
+  color: #fff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s ease;
+}
+
+.btn:hover {
+  background: #005bb5;
+}
+
+.success-msg {
+  color: green;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+/* Link beside "Bio" */
+.edit-bio-link {
+  font-size: 0.9rem;
+  margin-left: 6px;
+  color: #0073e6;
+  text-decoration: none;
+}
+.edit-bio-link:hover {
+  text-decoration: underline;
+}
+
+/* Modal */
+
+#bio-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+/* Modal box */
+#bio-modal {
+  display: none;
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 22px 20px 18px; /* slightly taller top/bottom padding */
+  border: 1px solid #aaa;
+  max-width: 420px;
+  width: 90%;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+  z-index: 1000;
+  border-radius: 8px;
+}
+
+/* Modal title */
+#bio-modal h3 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 12px; /* slightly tighter */
+}
+
+/* Textarea */
+#bio-modal textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-family: inherit;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 16px; /* adds space above buttons */
+}
+
+/* Buttons container (optional wrapper for spacing) */
+#bio-modal .modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px; /* slight padding above buttons */
+}
+
+/* Main buttons */
+#bio-modal .btn {
+  padding: 8px 18px;
+  font-size: 15px;
+  border-radius: 6px;
+}
+
+/* Secondary button */
+.btn-secondary {
+  background: none;
+  color: #333;
+  border: 1px solid #333;
+}
+.btn-secondary:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* --- LOGIN PAGE --- */
+
+.logincontent {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 20px;
+  background: #fafbfc;  /* subtle off-white background */
+  font-family: 'Inter', sans-serif;
+}
+
+/* Login panel */
+.login-panel {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;  /* white card */
+  border-radius: 12px;
+  padding: 32px 24px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);  /* soft shadow */
+}
+
+/* Title */
+.login-panel h2 {
+  margin-bottom: 24px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  color: #111;
+}
+
+/* Inputs */
+.login-panel input {
+  width: 100%;
+  font-size: 15px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.login-panel input:focus {
+  border-color: #94c8ff;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+/* Buttons */
+.login-panel button {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+/* Primary buttons (Log In / Complete Sign Up) */
+.login-panel button.login {
+  background: #fff;               /* white inside */
+  color: #4da3ff;                 /* outline color */
+  border: 1px solid #4da3ff;      /* outline */
+  transition: all 0.2s ease;
+}
+
+.login-panel button.login:hover {
+  background: #4da3ff;            /* fill on hover */
+  color: #fff;                     /* text turns white */
+}
+
+.login-panel button.login:active {
+  background: #2d74c4;            /* slightly darker on click */
+  color: #fff;
+}
+
+/* Secondary buttons (Sign Up toggle, Logout) */
+#show-signup-btn,
+#logout-btn {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+#show-signup-btn:hover,
+#logout-btn:hover {
+  background: #e9ecef;
+}
+
+/* Message box */
+#message-box {
+  margin-bottom: 16px;
+  font-size: 14px;
+  text-align: center;
+  font-weight: 500;
+  color: #dc3545;  /* subtle red for errors */
+}
+
+/* USERPAGES */
+
+.userpage body {
+  font-family: Arial, sans-serif; padding: 20px;
+}
+
+.userpage h1 {
+  color: #333;
+}
+
+.userpage p {
+  color: #555;
+}

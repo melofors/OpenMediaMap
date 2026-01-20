@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+          integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+          crossorigin=""/>
+    <link rel="stylesheet" href="style.css"/>
+    <script type="module" src="auth.js"></script>
+    <!-- fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="logos/favicon2.png">
+</head>
+<body class="about">
+    <span id="username-display" class="username-ellipse"></span>
+    <!-- TOPNAV -->
+    <div class="topnav">
+            <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo"></a>
+            <div class="nav-links">
+                <div class="topnav-left">
+                    <a class="page" href="map.html">Map</a>
+                    <a class="page" href="database.html">Database</a>
+                    <a class="page" href="contribute.html">Contribute</a>
+                    <a class="page" href="about.html">About</a>
+                    <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+                </div>
+                <div class="topnav-right">
+                    <div id="topnav-auth"> 
+                        <a class="page" href="login.html" id="login-link">Login</a>
+                    </div>
+                    <a class="page" href="forum.html">Forum</a>
+                </div>
+            </div>
+        </div>
+
+    <div class="contributecontent">
+        <h2>About</h2>
+        <p class="prose"><b>OpenMediaMap</b> is a free, open, and community-driven archive that maps the visual history of the world—one photograph at a time.</p>
+        <p class="prose">Our mission is to digitize and geo-locate every available old photograph, simultaneously providing a standardized database for such photographs.</p>
+        <p class="prose">In collecting photographs hidden in private collections, undigitized and susceptible to loss, or inaccessible behind institutional barriers, we hope to create an interactive record of how the world once looked.</p>
+        <p class="prose">With the core priority being the 19th-century, the cutoff date of 1930 leaves the door open for slightly later photos.</p>
+
+        <h2>The Pre-1900 Project</h2>
+        <p class="prose">Our flagship campaign, <strong>The Pre-1900 Project</strong>, focuses solely on photographs taken before the 20th century. Despite being the most vivid primary source available, 19th-century photographs are scattered, hidden, or forgotten.</p>
+        <p class="prose">This project aims to:</p>
+        <ul>
+            <li><p class="prose">Count and catalog as many 1800s photographs as possible.</p></li>
+            <li><p class="prose">Build the first open, global visual index of 19th-century photography.</p></li>
+            <li><p class="prose">Paint a complete picture of the 1800s on an interactive, digital map.</p></li>
+        </ul>
+        <p class="prose">You don't need to be a historian to help—just a photograph, a rough location, and the will to preserve the past.</p>
+
+        <h2>The OpenMediaMap Promise</h2>
+        <p class="prose">Powered by volunteers, OpenMediaMap is built on three core promises:</p>
+        <ul>
+            <li><p class="prose"><strong>Remain Free:</strong> No paywalls. Ever. Access to OpenMediaMap is seen as a right, not a privilege.</p></li>
+            <li><p class="prose"><strong>Remain Open:</strong> Contributions are preserved with the care and effort to benefit curious minds for generations to come, including frequent back-ups and strong backend infrastructure.</p></li>
+            <li><p class="prose"><strong>Remain Reliable:</strong> Every photo is reviewed and logged with accurate metadata, including coordinates, date, direction, and source.</p></li>
+        </ul>
+        <p class="prose">Whether you're an archivist, student, or someone with a box of old photos in the attic—<a href="contribute.html">you can contribute</a>.</p>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footerfront">
+        <div class="contactfront">
+            <p>OpenMediaMap™</p>
+        </div>
+    </div>
+
+</body>
+</html>

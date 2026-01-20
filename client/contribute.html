@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contribute</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+    integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="logos/favicon2.png" />
+
+  <!-- IMPORTANT: auth.js uses ES imports, so it MUST be loaded as a module -->
+  <script type="module" src="auth.js"></script>
+</head>
+
+<body>
+  <span id="username-display" class="username-ellipse"></span>
+
+  <!-- TOPNAV -->
+  <div class="topnav">
+    <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo" /></a>
+
+    <div class="nav-links">
+      <div class="topnav-left">
+        <a class="page" href="map.html">Map</a>
+        <a class="page" href="database.html">Database</a>
+        <a class="page" href="contribute.html">Contribute</a>
+        <a class="page" href="about.html">About</a>
+        <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+      </div>
+
+      <div class="topnav-right">
+        <div id="topnav-auth">
+          <a class="page" href="login.html" id="login-link">Login</a>
+        </div>
+        <a class="page" href="forum.html">Forum</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="contributecontent">
+    <h2>Contribute a Historical Photograph</h2>
+    <p>
+      Help us preserve the past by submitting a photograph. Please fill out all required fields as accurately as possible.
+      Every entry is reviewed before being added to the map.
+    </p>
+
+    <p
+      id="loginWarning"
+      style="
+        display:none;
+        background:#f0f4ff;
+        border:1px solid #b0c4de;
+        color:#003366;
+        padding:10px 14px;
+        border-radius:8px;
+        margin-bottom:15px;
+        font-size:0.95em;
+      "
+    >
+      ⚠️ You must be logged in to submit a photo. You can still view the form, but all inputs are disabled.
+      <a href="/login.html" style="color:#0044cc; text-decoration:underline;">Create an account</a>
+      or
+      <a href="/login.html" style="color:#0044cc; text-decoration:underline;">log in here</a>.
+    </p>
+
+    <form id="recordForm" enctype="multipart/form-data">
+      <fieldset>
+        <legend>Photo Details</legend>
+
+        <label for="caption">Caption <span class="required">*</span></label>
+        <input type="text" name="caption" id="caption" placeholder="e.g. Main Street, Baltimore in winter" required />
+
+        <label for="photographer">Photographer (if known)</label>
+        <input type="text" name="photographer" id="photographer" placeholder="e.g. John Smith" />
+
+        <label>Date Taken <span class="required">*</span></label>
+        <input type="number" id="year" name="year" placeholder="YYYY" min="1800" max="1929" required />
+        <input type="number" id="month" name="month" placeholder="MM (optional)" min="1" max="12" />
+        <input type="number" id="day" name="day" placeholder="DD (optional)" min="1" max="31" />
+
+        <div class="checkbox-row">
+          <label><input type="checkbox" id="estimatedDate" name="estimated" /> Estimated Date (<abbr title="circa">c.</abbr>)</label>
+          <label><input type="checkbox" id="unknownDate" /> Unknown Date<span style="color:gray;">*</span></label>
+        </div>
+
+        <p id="unknownDateNote">
+          <span style="color:gray;">*</span> Must be confidently taken before January 1, 1930
+        </p>
+      </fieldset>
+
+      <!-- SOURCE FIELDSET -->
+      <fieldset>
+        <legend>Source</legend>
+
+        <label for="source-type">Source Type</label>
+        <select id="source-type">
+          <option value="regular">Regular</option>
+          <option value="structured">Structured</option>
+        </select>
+
+        <!-- Regular Source Input -->
+        <div id="regular-source-group">
+          <label for="source-text" style="margin-top: 10px;">Source <span class="required">*</span></label>
+          <input type="text" id="source-text" placeholder="e.g. Family album, Library of Congress" />
+
+          <label for="source-link">Link (optional)</label>
+          <input type="url" id="source-link" placeholder="https://example.com" style="margin-top: 10px;" />
+        </div>
+
+        <!-- Structured Source Input -->
+        <div id="structured-source-group" style="display:none">
+          <label for="source-title">Title <span class="required">*</span></label>
+          <input type="text" id="source-title" placeholder="e.g. *Old Baltimore Streets*" />
+
+          <label for="source-author">Author <span class="required">*</span></label>
+          <input type="text" id="source-author" placeholder="e.g. John Smith" />
+
+          <label for="source-publisher">Publisher <span class="required">*</span></label>
+          <input type="text" id="source-publisher" placeholder="e.g. Baltimore History Press" />
+
+          <label for="source-date">Year Published <span class="required">*</span></label>
+          <input type="text" id="source-date" placeholder="e.g. 1892" />
+
+          <label for="source-structured-link">Link (optional)</label>
+          <input type="url" id="source-structured-link" placeholder="https://example.com" />
+        </div>
+
+        <!-- Hidden input that actually gets submitted -->
+        <input type="hidden" name="source" id="source" required />
+      </fieldset>
+
+      <!-- LOCATION FIELDSET -->
+      <fieldset>
+        <div class="legend-row">
+          <legend>Location</legend>
+          <a href="#" class="coord-help" onclick="openHelpModal(); return false;">How to get coordinates</a>
+        </div>
+
+        <label for="lat">Latitude <span class="required">*</span></label>
+        <input
+          type="text"
+          inputmode="decimal"
+          pattern="^-?[0-9]*[.]?[0-9]+$"
+          name="lat"
+          id="lat"
+          placeholder="e.g. 39.2904"
+          required
+        />
+
+        <label for="lng">Longitude <span class="required">*</span></label>
+        <input
+          type="text"
+          inputmode="decimal"
+          pattern="^-?[0-9]*[.]?[0-9]+$"
+          name="lng"
+          id="lng"
+          placeholder="e.g. -76.6122"
+          required
+        />
+
+        <label>
+          <input type="checkbox" id="unknownLocation" /> Unknown Location
+        </label>
+      </fieldset>
+
+      <!-- NOTES FIELDSET -->
+      <fieldset>
+        <legend>Notes</legend>
+        <textarea id="notes" name="notes" rows="6" placeholder="Add research notes and observations here..."></textarea>
+      </fieldset>
+
+      <!-- UPLOAD FIELDSET -->
+      <fieldset>
+        <legend>Upload</legend>
+
+        <label for="photo" class="drop-area">
+          <span>Upload Photograph <span class="required">*</span></span><br />
+          <span class="subtext">(Click or drag an image here)</span>
+          <input type="file" name="photo" id="photo" accept="image/*" required hidden />
+        </label>
+
+        <img id="preview" style="margin-top: 1rem; max-width: 200px; display: none; border-radius: 4px;" alt="Image preview" />
+      </fieldset>
+
+      <button type="submit">Submit Photo</button>
+      <p id="response"></p>
+    </form>
+
+    <!-- Overlay -->
+    <div id="form-help-overlay" onclick="closeHelpModal()"></div>
+
+    <!-- Modal -->
+    <div id="form-help-modal">
+      <h3>Coordinates</h3>
+      <p>
+        On most map services, such as Google Maps, right-click the <b>exact</b> location of your photo, then copy the
+        coordinates given. Satellite view is recommended to better view surroundings.
+      </p>
+      <p>
+        OpenMediaMap utilizes <u>decimal degree</u> coordinates (e.g. 39.296216, -76.613406). If using
+        <u>degrees-minutes-seconds</u> notation, convert them here:
+      </p>
+
+      <!-- DMS Converter inside Modal -->
+      <div id="dms-converter" style="margin-top:10px; padding:10px; background:#f2f2f2; border-radius:6px;">
+        <h4 style="margin-top:0">DMS to Decimal Degrees Converter</h4>
+
+        <style>
+          #dms-converter select {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+          }
+          #dms-converter select:hover { border-color: #888; }
+        </style>
+
+        <!-- Latitude Inputs -->
+        <div style="margin-bottom:12px;">
+          <label>Latitude (DMS):</label>
+          <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:4px;">
+            <input type="number" id="lat-deg" placeholder="Deg" min="0" max="90" style="width:68px;" required />
+            <span>°</span>
+            <input type="number" id="lat-min" placeholder="Min" min="0" max="59" style="width:68px;" required />
+            <span>'</span>
+            <input type="number" id="lat-sec" placeholder="Sec" min="0" max="59.999" step="0.001" style="width:80px;" required />
+            <span>"</span>
+            <select id="lat-dir">
+              <option value="N">N</option>
+              <option value="S">S</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Longitude Inputs -->
+        <div>
+          <label>Longitude (DMS):</label>
+          <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:4px;">
+            <input type="number" id="lng-deg" placeholder="Deg" min="0" max="180" style="width:68px;" required />
+            <span>°</span>
+            <input type="number" id="lng-min" placeholder="Min" min="0" max="59" style="width:68px;" required />
+            <span>'</span>
+            <input type="number" id="lng-sec" placeholder="Sec" min="0" max="59.999" step="0.001" style="width:80px;" required />
+            <span>"</span>
+            <select id="lng-dir">
+              <option value="E">E</option>
+              <option value="W">W</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="button" onclick="convertDMSToDD()" style="margin-top:10px;">Convert & Autofill</button>
+        <p id="dms-result" style="margin-top:6px; font-size:0.9em;"></p>
+      </div>
+
+      <button type="button" onclick="closeHelpModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- SUBMIT FORM (module, because it uses imports) -->
+  <script type="module">
+    import { API_BASE_URL } from "./config.js";
+    import { auth } from "./auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+    // Cache elements
+    const form = document.getElementById("recordForm");
+    const responseEl = document.getElementById("response");
+    const loginWarning = document.getElementById("loginWarning");
+    const coordHelpLink = document.querySelector(".coord-help");
+
+    // Disable form inputs until auth state is known
+    form.style.opacity = "0.6";
+    [...form.elements].forEach((el) => (el.disabled = true));
+
+    function isSafeHttpUrl(u) {
+      try {
+        const url = new URL(u);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }
+
+    // Watch auth state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // ✅ Logged in — enable form
+        loginWarning.style.display = "none";
+        form.style.opacity = "1";
+        [...form.elements].forEach((el) => (el.disabled = false));
+
+        // Enable coordinate help modal
+        coordHelpLink.onclick = (e) => {
+          e.preventDefault();
+          openHelpModal();
+        };
+        coordHelpLink.style.pointerEvents = "auto";
+        coordHelpLink.style.opacity = "1";
+        coordHelpLink.title = "Click to open coordinate help";
+      } else {
+        // 🚫 Logged out — disable form
+        loginWarning.style.display = "block";
+        form.style.opacity = "0.6";
+        [...form.elements].forEach((el) => (el.disabled = true));
+
+        // Let them see the form but prevent submission
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.onclick = (e) => {
+            e.preventDefault();
+            responseEl.textContent = "⚠️ Please log in before submitting.";
+            responseEl.style.color = "red";
+          };
+        }
+
+        // Disable coordinate help modal
+        coordHelpLink.onclick = null;
+        coordHelpLink.style.pointerEvents = "none";
+        coordHelpLink.style.opacity = "0.6";
+        coordHelpLink.title = "Login required to use this feature";
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Must be logged in (server requires Bearer token)
+      const user = auth.currentUser;
+      if (!user) {
+        responseEl.textContent = "⚠️ Please log in before submitting.";
+        responseEl.style.color = "red";
+        return;
+      }
+
+      // Validate coordinates if location is known
+      const isUnknownLocation = document.getElementById("unknownLocation").checked;
+      const latInput = document.getElementById("lat").value.trim();
+      const lngInput = document.getElementById("lng").value.trim();
+
+      if (!isUnknownLocation) {
+        const lat = parseFloat(latInput);
+        const lng = parseFloat(lngInput);
+
+        if (Number.isNaN(lat) || Number.isNaN(lng)) {
+          responseEl.textContent = "❌ Please enter valid numeric values for latitude and longitude.";
+          responseEl.style.color = "red";
+          return;
+        }
+
+        if (lat < -90 || lat > 90) {
+          responseEl.textContent = "❌ Latitude must be between -90 and 90.";
+          responseEl.style.color = "red";
+          return;
+        }
+
+        if (lng < -180 || lng > 180) {
+          responseEl.textContent = "❌ Longitude must be between -180 and 180.";
+          responseEl.style.color = "red";
+          return;
+        }
+      }
+
+      // Handle source formatting (STORE PLAIN TEXT — avoid stored XSS)
+      const sourceType = document.getElementById("source-type").value;
+      let finalSource = "";
+
+      if (sourceType === "regular") {
+        const text = document.getElementById("source-text").value.trim();
+        const link = document.getElementById("source-link").value.trim();
+
+        if (!text) {
+          responseEl.textContent = "❌ Please enter a source.";
+          responseEl.style.color = "red";
+          return;
+        }
+
+        if (link && !isSafeHttpUrl(link)) {
+          responseEl.textContent = "❌ Source link must be a valid http(s) URL.";
+          responseEl.style.color = "red";
+          return;
+        }
+
+        finalSource = link ? `${text} (${link})` : text;
+      } else {
+        const title = document.getElementById("source-title").value.trim();
+        const author = document.getElementById("source-author").value.trim();
+        const publisher = document.getElementById("source-publisher").value.trim();
+        const date = document.getElementById("source-date").value.trim();
+        const link = document.getElementById("source-structured-link").value.trim();
+
+        if (!title || !author || !publisher || !date) {
+          responseEl.textContent = "❌ Please complete all structured source fields (title, author, publisher, date).";
+          responseEl.style.color = "red";
+          return;
+        }
+
+        if (link && !isSafeHttpUrl(link)) {
+          responseEl.textContent = "❌ Source link must be a valid http(s) URL.";
+          responseEl.style.color = "red";
+          return;
+        }
+
+        finalSource = title;
+        finalSource += `. ${author}`;
+        finalSource += `. ${publisher}`;
+        finalSource += `. ${date}`;
+        if (link) finalSource += ` (${link})`;
+      }
+
+      // Inject into hidden field (BEFORE FormData)
+      document.getElementById("source").value = finalSource;
+
+      const formData = new FormData(e.target);
+
+      // Attach Firebase ID token for requireAuth
+      let idToken = "";
+      try {
+        idToken = await user.getIdToken();
+      } catch (err) {
+        console.error("Failed to get ID token:", err);
+        responseEl.textContent = "❌ Auth error. Please log out and log back in.";
+        responseEl.style.color = "red";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/submissions/submit`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: formData,
+        });
+
+        if (res.ok) {
+          responseEl.textContent = "✅ Record submitted.";
+          responseEl.style.color = "green";
+          e.target.reset();
+        } else {
+          const error = await res.json().catch(() => ({}));
+          responseEl.textContent = `❌ Error: ${error.error || error.message || "Submission failed."}`;
+          responseEl.style.color = "red";
+        }
+      } catch (err) {
+        responseEl.textContent = "❌ Network error. Please try again.";
+        responseEl.style.color = "red";
+      }
+
+      setTimeout(() => {
+        responseEl.textContent = "";
+      }, 5000);
+    });
+  </script>
+
+  <!-- UNKNOWN DATE -->
+  <script>
+    document.getElementById("unknownDate").addEventListener("change", function () {
+      const isUnknown = this.checked;
+
+      const year = document.getElementById("year");
+      const month = document.getElementById("month");
+      const day = document.getElementById("day");
+      const estimatedDate = document.getElementById("estimatedDate");
+      const unknownDateNote = document.getElementById("unknownDateNote");
+
+      if (isUnknown) {
+        year.disabled = true;
+        month.disabled = true;
+        day.disabled = true;
+
+        year.required = false;
+        month.required = false;
+        day.required = false;
+
+        year.value = "";
+        month.value = "";
+        day.value = "";
+
+        estimatedDate.checked = false;
+        estimatedDate.disabled = true;
+
+        unknownDateNote.style.display = "block";
+      } else {
+        year.disabled = false;
+        year.required = true;
+        month.disabled = false;
+        day.disabled = false;
+
+        estimatedDate.disabled = false;
+        unknownDateNote.style.display = "none";
+      }
+    });
+  </script>
+
+  <!-- UNKNOWN LOCATION -->
+  <script>
+    document.getElementById("unknownLocation").addEventListener("change", function () {
+      const isUnknown = this.checked;
+
+      const lat = document.getElementById("lat");
+      const lng = document.getElementById("lng");
+
+      if (isUnknown) {
+        lat.disabled = true;
+        lng.disabled = true;
+        lat.required = false;
+        lng.required = false;
+        lat.value = "";
+        lng.value = "";
+      } else {
+        lat.disabled = false;
+        lng.disabled = false;
+        lat.required = true;
+        lng.required = true;
+      }
+    });
+  </script>
+
+  <!-- SOURCE DISPLAY -->
+  <script>
+    document.getElementById("source-type").addEventListener("change", function () {
+      const isStructured = this.value === "structured";
+      document.getElementById("regular-source-group").style.display = isStructured ? "none" : "block";
+      document.getElementById("structured-source-group").style.display = isStructured ? "block" : "none";
+    });
+  </script>
+
+  <!-- MODAL -->
+  <script>
+    function openHelpModal() {
+      document.getElementById("form-help-modal").style.display = "block";
+      document.getElementById("form-help-overlay").style.display = "block";
+    }
+
+    function closeHelpModal() {
+      document.getElementById("form-help-modal").style.display = "none";
+      document.getElementById("form-help-overlay").style.display = "none";
+    }
+  </script>
+
+  <!-- DRAG AND DROP IMAGE (includes preview) -->
+  <script>
+    const dropArea = document.querySelector(".drop-area");
+    const fileInput = document.getElementById("photo");
+    const preview = document.getElementById("preview");
+
+    dropArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropArea.classList.add("dragover");
+    });
+
+    dropArea.addEventListener("dragleave", () => {
+      dropArea.classList.remove("dragover");
+    });
+
+    dropArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropArea.classList.remove("dragover");
+
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        showPreview(fileInput.files[0]);
+      }
+    });
+
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files.length) showPreview(fileInput.files[0]);
+    });
+
+    function showPreview(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+
+  <!-- DMS TO DD -->
+  <script>
+    function convertDMSToDD() {
+      const latDeg = parseFloat(document.getElementById("lat-deg").value);
+      const latMin = parseFloat(document.getElementById("lat-min").value);
+      const latSec = parseFloat(document.getElementById("lat-sec").value);
+      const latDir = document.getElementById("lat-dir").value;
+
+      const lngDeg = parseFloat(document.getElementById("lng-deg").value);
+      const lngMin = parseFloat(document.getElementById("lng-min").value);
+      const lngSec = parseFloat(document.getElementById("lng-sec").value);
+      const lngDir = document.getElementById("lng-dir").value;
+
+      const result = document.getElementById("dms-result");
+
+      if ([latDeg, latMin, latSec, lngDeg, lngMin, lngSec].some((v) => Number.isNaN(v))) {
+        result.textContent = "❌ Please fill in all DMS fields with valid numbers.";
+        result.style.color = "red";
+        return;
+      }
+
+      let latDD = latDeg + latMin / 60 + latSec / 3600;
+      let lngDD = lngDeg + lngMin / 60 + lngSec / 3600;
+
+      if (latDir === "S") latDD *= -1;
+      if (lngDir === "W") lngDD *= -1;
+
+      latDD = parseFloat(latDD.toFixed(8));
+      lngDD = parseFloat(lngDD.toFixed(8));
+
+      const isUnknownLocation = document.getElementById("unknownLocation").checked;
+      if (!isUnknownLocation) {
+        document.getElementById("lat").value = latDD;
+        document.getElementById("lng").value = lngDD;
+      }
+
+      result.textContent = `✅ Converted to: ${latDD}, ${lngDD}`;
+      result.style.color = "green";
+    }
+  </script>
+</body>
+</html>

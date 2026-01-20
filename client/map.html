@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OpenMediaMap</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+            integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+            crossorigin=""/>
+        <link rel="stylesheet" href="style.css"/>
+        <script type="module" src="auth.js"></script>
+        <link rel="icon" type="image/x-icon" href="logos/favicon2.png">
+    </head>
+    <body class="map">
+        <span id="username-display" class="username-ellipse"></span>
+        <!-- TOPNAV -->
+        <div class="topnav">
+            <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo"></a>
+            <div class="nav-links">
+                <div class="topnav-left">
+                    <a class="page" href="map.html">Map</a>
+                    <a class="page" href="database.html">Database</a>
+                    <a class="page" href="contribute.html">Contribute</a>
+                    <a class="page" href="about.html">About</a>
+                    <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+                </div>
+                <div class="topnav-right">
+                    <div id="topnav-auth"> 
+                        <a class="page" href="login.html" id="login-link">Login</a>
+                    </div>
+                    <a class="page" href="forum.html">Forum</a>
+                </div>
+            </div>
+            <script type="module" src="map.js" defer></script>
+        </div>
+
+        <!-- MAP -->
+        <div class="mainmap custom-popup" id="map"></div>
+        <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+                integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+                crossorigin=""></script>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="contact"><a href="mailto:hamaharoof@gmail.com">©OpenMediaMap 2024</a></div>
+            <div class="legend">
+                <a>
+                    <img src="markers/1700s and below.png" alt="1700s or earlier" class="marker"> 1700s or earlier
+                    <img src="markers/1800s early.png" alt="early 1800s" class="marker"> early 1800s
+                    <img src="markers/1800s mid.png" alt="mid 1800s" class="marker"> mid-1800s
+                    <img src="markers/1800s late.png" alt="late 1800s" class="marker"> late 1800s
+                    <img src="markers/1900s.png" alt="1900s" class="marker"> 1900s
+                    <img src="markers/1910s.png" alt="1910s" class="marker"> 1910s
+                    <img src="markers/1920s.png" alt="1920s" class="marker"> 1920s
+                    <img src="markers/1930s.png" alt="1930s" class="marker"> 1930s
+                </a>
+            </div>
+        </footer>
+
+    </body>
+</html>

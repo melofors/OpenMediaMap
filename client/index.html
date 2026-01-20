@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OpenMediaMap</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin=""/>
+        <link rel="stylesheet" href="style.css">
+        <script type="module" src="auth.js"></script>
+        <script
+            src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+            integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+            crossorigin=""
+            defer
+        ></script>
+        <script type="module" src="map.js"></script>
+        <link rel="icon" type="image/x-icon" href="logos/favicon2.png">
+    </head>
+    <body class="front">
+        <span id="username-display" class="username-ellipse"></span>
+        <!-- TOPNAV -->
+        <div class="topnav">
+            <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo"></a>
+            <div class="nav-links">
+                <div class="topnav-left">
+                    <a class="page" href="map.html">Map</a>
+                    <a class="page" href="database.html">Database</a>
+                    <a class="page" href="contribute.html">Contribute</a>
+                    <a class="page" href="about.html">About</a>
+                    <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+                </div>
+                <div class="topnav-right">
+                    <div id="topnav-auth"> 
+                        <a class="page" href="login.html" id="login-link">Login</a>
+                    </div>
+                    <a class="page" href="forum.html">Forum</a>
+                </div>
+            </div>
+        </div>
+        <!-- ABOUT CONTENT -->
+        <div class="frontcontent">
+            <h1>The Pre-1900 Project</h1>
+            
+            <p class="caption1">Digitized and geolocated <a href="database.html">14,382</a> 19th-century photographs <a href="contribute.html">and counting</a>...</p>
+        
+            <div class="minimapcontainer">
+                <div class="minimap custom-popup" id="map"></div>
+            </div>
+
+            <p class="caption2">an initiative by the</p>
+
+            <div class="logodiv">
+                <img src="logos/logo.png" alt="Logo">
+            </div>
+
+            <p class="caption3">We have a mission to get photographs out of private collections and archives, where they are unseen and unable to be used.</p>
+            <p class="caption3">We depend on volunteers from all over the world. Learn <a href="contribute.html">how to add your first photo</a>.</p>
+            
+
+        <p class="caption4">Click below to explore:</p>
+            <div class="buttondiv">
+                <!-- <button class="button" onclick="location.href='contribute.html'">Contribute</button> -->
+                <button class="button" onclick="location.href='map.html'">View Map</button>
+                <!-- <button class="button" onclick="location.href='about.html'">About</button> -->
+            </div>
+        
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footerfront">
+        <div class="footer-inner">
+
+            <div class="footer-brand">
+            <p class="footer-title">OpenMediaMap™</p>
+            <p class="footer-tagline">Mapping and preserving historical media</p>
+            </div>
+
+            <nav class="footer-links">
+            <a href="map.html">Map</a>
+            <a href="database.html">Database</a>
+            <a href="contribute.html">Contribute</a>
+            <a href="about.html">About</a>
+            <a href="forum.html">Forum</a>
+            </nav>
+
+        </div>
+        </footer>
+
+    </body>
+</html>
