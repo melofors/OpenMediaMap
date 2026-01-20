@@ -15,3 +15,6 @@ build/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Firebase / Google service account key
+server/serviceAccountKey.json
