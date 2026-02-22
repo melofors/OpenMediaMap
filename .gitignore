@@ -17,4 +17,4 @@ Thumbs.db
 .vscode/
 
 # Firebase / Google service account key
-server/serviceAccountKey.json
+server/serviceAccountKey.json.env

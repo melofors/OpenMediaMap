@@ -75,7 +75,7 @@ document.addEventListener("click", (e) => {
 });
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAdjJCwjogTnoZIWAzTbfqkzDMYohTn-kw",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
   authDomain: "openmediamap.firebaseapp.com",
   projectId: "openmediamap",
   storageBucket: "openmediamap.appspot.com",
