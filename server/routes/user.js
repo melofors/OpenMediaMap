@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const admin = require('../firebaseAdmin');
 
-// --- Helpers ---
 function escapeHtml(input) {
   return String(input ?? '')
     .replace(/&/g, '&amp;')
@@ -16,25 +15,32 @@ function isValidUsername(username) {
   return typeof username === 'string' && /^[a-zA-Z0-9_]{3,30}$/.test(username);
 }
 
-// NEW: API endpoint that returns JSON
-router.get('/api/:username', async (req, res) => {
+// This handles BOTH /api/user/:username AND /user/:username
+// depending on how it's mounted in server.js
+router.get('/:username', async (req, res) => {
   const db = admin.firestore();
   const pgDB = require('../models/db');
   const usernameRaw = req.params.username;
 
   if (!isValidUsername(usernameRaw)) {
-    return res.status(400).json({ error: 'Invalid username' });
+    // Return JSON if API, HTML if regular
+    if (req.baseUrl.startsWith('/api')) {
+      return res.status(400).json({ error: 'Invalid username' });
+    }
+    return res.status(400).send('Invalid username.');
   }
 
   const username = usernameRaw;
 
   try {
-    // Fetch user from Firestore
     const usersRef = db.collection('users');
     const querySnapshot = await usersRef.where('username', '==', username).limit(1).get();
 
     if (querySnapshot.empty) {
-      return res.status(404).json({ error: 'User not found' });
+      if (req.baseUrl.startsWith('/api')) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      return res.status(404).send('<h1>User not found.</h1>');
     }
 
     const userDoc = querySnapshot.docs[0];
@@ -56,43 +62,17 @@ router.get('/api/:username', async (req, res) => {
       console.error('Error fetching submission count:', pgErr);
     }
 
-    // Return JSON data
-    res.json({
-      username: userData.username || username,
-      bio: userData.bio || '',
-      created_at: userData.created_at ? userData.created_at.toDate().toISOString() : null,
-      submissionCount
-    });
-
-  } catch (err) {
-    console.error('Error in /api/user/:username route:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// OLD: Keep old server-rendered route for backward compatibility
-router.get('/:username', async (req, res) => {
-  const db = admin.firestore();
-  const pgDB = require('../models/db');
-  const usernameRaw = req.params.username;
-
-  if (!isValidUsername(usernameRaw)) {
-    return res.status(400).send('Invalid username.');
-  }
-
-  const username = usernameRaw;
-
-  try {
-    const usersRef = db.collection('users');
-    const querySnapshot = await usersRef.where('username', '==', username).limit(1).get();
-
-    if (querySnapshot.empty) {
-      return res.status(404).send('<h1>User not found.</h1>');
+    // Return JSON for API endpoint
+    if (req.baseUrl.startsWith('/api')) {
+      return res.json({
+        username: userData.username || username,
+        bio: userData.bio || '',
+        created_at: userData.created_at ? userData.created_at.toDate().toISOString() : null,
+        submissionCount
+      });
     }
 
-    const userDoc = querySnapshot.docs[0];
-    const userData = userDoc.data() || {};
-
+    // Return HTML for regular endpoint
     const safeUsername = escapeHtml(userData.username || username);
     const safeBio = escapeHtml(userData.bio || 'No bio yet.');
 
@@ -102,21 +82,6 @@ router.get('/:username', async (req, res) => {
         joinedText = userData.created_at.toDate().toDateString();
       }
     } catch {}
-
-    let submissionCount = 0;
-    try {
-      const result = await pgDB.query(
-        `SELECT COUNT(*)
-         FROM submissions
-         WHERE user_id = $1
-           AND status = 'approved'
-           AND deleted = FALSE`,
-        [userData.username || username]
-      );
-      submissionCount = Number(result.rows?.[0]?.count ?? 0);
-    } catch (pgErr) {
-      console.error('Error fetching submission count:', pgErr);
-    }
 
     res.send(`
 <!DOCTYPE html>
@@ -212,7 +177,11 @@ router.get('/:username', async (req, res) => {
     `);
   } catch (err) {
     console.error('Error in /user/:username route:', err);
-    res.status(500).send('Server error.');
+    if (req.baseUrl.startsWith('/api')) {
+      res.status(500).json({ error: 'Server error' });
+    } else {
+      res.status(500).send('Server error.');
+    }
   }
 });
 

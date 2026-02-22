@@ -10,8 +10,22 @@ function escapeHtml(str) {
 }
 
 async function loadUserProfile() {
-  const params = new URLSearchParams(window.location.search);
-  const username = params.get('username');
+  // Extract username from URL path (/user/hasan) OR query param (?username=hasan)
+  let username = null;
+  
+  // Method 1: Check URL path
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+  if (pathParts[0] === 'user' && pathParts[1]) {
+    username = pathParts[1];
+  }
+  
+  // Method 2: Check query parameter (fallback)
+  if (!username) {
+    const params = new URLSearchParams(window.location.search);
+    username = params.get('username');
+  }
+
+  console.log('Extracted username:', username); // Debug log
 
   if (!username) {
     document.getElementById('loading').style.display = 'none';
@@ -21,13 +35,17 @@ async function loadUserProfile() {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/user/${encodeURIComponent(username)}`);
+    const apiUrl = `${API_BASE_URL}/api/user/${encodeURIComponent(username)}`;
+    console.log('Fetching from:', apiUrl); // Debug log
+    
+    const response = await fetch(apiUrl);
     
     if (!response.ok) {
       throw new Error(response.status === 404 ? 'User not found' : 'Failed to load profile');
     }
 
     const userData = await response.json();
+    console.log('User data:', userData); // Debug log
 
     // Update page title
     document.title = `@${userData.username}'s Profile`;
