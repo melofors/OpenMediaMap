@@ -18,3 +18,4 @@ Thumbs.db
 
 # Firebase / Google service account key
 server/serviceAccountKey.json.env
+client/firebase-config.js

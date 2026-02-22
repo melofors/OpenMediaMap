@@ -17,6 +17,7 @@ import {
   where,
   getDocs
 } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+import { FIREBASE_API_KEY } from './firebase-config.js';
 
 function showMessage(msg, color = "red") {
   const box = document.getElementById("message-box");
@@ -75,7 +76,7 @@ document.addEventListener("click", (e) => {
 });
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
+  apiKey: FIREBASE_API_KEY,
   authDomain: "openmediamap.firebaseapp.com",
   projectId: "openmediamap",
   storageBucket: "openmediamap.appspot.com",
