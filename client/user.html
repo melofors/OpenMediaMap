@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+  <link rel="stylesheet" href="/style.css" />
+  <script type="module" src="/auth.js"></script>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="/index.html">
+    <img src="/logos/logo.png" class="logo" alt="Logo">
+  </a>
+  <div class="nav-links">
+    <div class="topnav-left">
+      <a class="page" href="/map.html">Map</a>
+      <a class="page" href="/database.html">Database</a>
+      <a class="page" href="/contribute.html">Contribute</a>
+      <a class="page" href="/about.html">About</a>
+      <a id="admin-link" class="page" href="/admin.html" style="display:none">Admin</a>
+    </div>
+    <div class="topnav-right">
+      <div id="topnav-auth">
+        <a class="page" href="/login.html" id="login-link">Login</a>
+      </div>
+      <a class="page" href="/forum.html">Forum</a>
+    </div>
+  </div>
+</div>
+
+<div class="main-forum-layout">
+  <nav class="vertical-tabs" role="tablist" aria-orientation="vertical">
+    <div id="user-link-container" class="login-link">
+      <a href="/login.html">Login</a>
+    </div>
+    <a href="/forum.html" role="tab" class="tab">Forum</a>
+    <a href="/recent.html" role="tab" class="tab">Recent Contributions</a>
+  </nav>
+
+  <main class="forumcontent" role="tabpanel">
+    <div id="loading">Loading profile...</div>
+    <div id="error" style="display:none; color: #ef4444;"></div>
+    
+    <div id="profile-content" style="display:none;">
+      <div class="profile-header">
+        <div class="profile-header-inner">
+          <div class="profile-avatar">
+            <span id="avatar-letter"></span>
+          </div>
+          <div class="profile-info">
+            <h1 id="username"></h1>
+            <p class="profile-meta">
+              Joined: <span id="joined-date"></span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-bio" id="profile-bio-section">
+        <h3 id="bio-header">Bio</h3>
+        <p id="bio-text"></p>
+      </div>
+
+      <div class="profile-bio">
+        <h3>Stats</h3>
+        <p>
+          Number of files uploaded: <span id="submission-count"></span>
+          (<a id="view-submissions" href="#">view</a>)
+        </p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="/user.js"></script>
+</body>
+</html>

@@ -4,7 +4,6 @@ const admin = require('../firebaseAdmin');
 
 // --- Helpers ---
 function escapeHtml(input) {
-  // Escapes text for safe HTML interpolation (prevents XSS)
   return String(input ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -13,54 +12,35 @@ function escapeHtml(input) {
     .replace(/'/g, '&#39;');
 }
 
-// Conservative username rules: letters/numbers/underscore, 3-30 chars.
-// Adjust to match your actual signup constraints.
 function isValidUsername(username) {
   return typeof username === 'string' && /^[a-zA-Z0-9_]{3,30}$/.test(username);
 }
 
-router.get('/:username', async (req, res) => {
+// NEW: API endpoint that returns JSON
+router.get('/api/:username', async (req, res) => {
   const db = admin.firestore();
   const pgDB = require('../models/db');
   const usernameRaw = req.params.username;
 
   if (!isValidUsername(usernameRaw)) {
-    return res.status(400).send('Invalid username.');
+    return res.status(400).json({ error: 'Invalid username' });
   }
 
-  const username = usernameRaw; // validated
+  const username = usernameRaw;
 
   try {
-    if (process.env.DEBUG_USER_ROUTES === 'true') {
-      console.log(`Fetching user: ${username}`);
-    }
-
-    // 1. Fetch user from Firestore
+    // Fetch user from Firestore
     const usersRef = db.collection('users');
     const querySnapshot = await usersRef.where('username', '==', username).limit(1).get();
 
     if (querySnapshot.empty) {
-      // Avoid reflecting untrusted input in HTML
-      return res.status(404).send('<h1>User not found.</h1>');
+      return res.status(404).json({ error: 'User not found' });
     }
 
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data() || {};
 
-    const safeUsername = escapeHtml(userData.username || username);
-    const safeBio = escapeHtml(userData.bio || 'No bio yet.');
-
-    // Handle created_at safely
-    let joinedText = 'Unknown';
-    try {
-      if (userData.created_at && typeof userData.created_at.toDate === 'function') {
-        joinedText = userData.created_at.toDate().toDateString();
-      }
-    } catch {
-      // keep default
-    }
-
-    // 2. Fetch submission count (safe param query)
+    // Fetch submission count
     let submissionCount = 0;
     try {
       const result = await pgDB.query(
@@ -76,8 +56,68 @@ router.get('/:username', async (req, res) => {
       console.error('Error fetching submission count:', pgErr);
     }
 
-    // 3. Render profile page
-    // NOTE: Email intentionally not rendered publicly (PII + scraping risk).
+    // Return JSON data
+    res.json({
+      username: userData.username || username,
+      bio: userData.bio || '',
+      created_at: userData.created_at ? userData.created_at.toDate().toISOString() : null,
+      submissionCount
+    });
+
+  } catch (err) {
+    console.error('Error in /api/user/:username route:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// OLD: Keep old server-rendered route for backward compatibility
+router.get('/:username', async (req, res) => {
+  const db = admin.firestore();
+  const pgDB = require('../models/db');
+  const usernameRaw = req.params.username;
+
+  if (!isValidUsername(usernameRaw)) {
+    return res.status(400).send('Invalid username.');
+  }
+
+  const username = usernameRaw;
+
+  try {
+    const usersRef = db.collection('users');
+    const querySnapshot = await usersRef.where('username', '==', username).limit(1).get();
+
+    if (querySnapshot.empty) {
+      return res.status(404).send('<h1>User not found.</h1>');
+    }
+
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data() || {};
+
+    const safeUsername = escapeHtml(userData.username || username);
+    const safeBio = escapeHtml(userData.bio || 'No bio yet.');
+
+    let joinedText = 'Unknown';
+    try {
+      if (userData.created_at && typeof userData.created_at.toDate === 'function') {
+        joinedText = userData.created_at.toDate().toDateString();
+      }
+    } catch {}
+
+    let submissionCount = 0;
+    try {
+      const result = await pgDB.query(
+        `SELECT COUNT(*)
+         FROM submissions
+         WHERE user_id = $1
+           AND status = 'approved'
+           AND deleted = FALSE`,
+        [userData.username || username]
+      );
+      submissionCount = Number(result.rows?.[0]?.count ?? 0);
+    } catch (pgErr) {
+      console.error('Error fetching submission count:', pgErr);
+    }
+
     res.send(`
 <!DOCTYPE html>
 <html lang="en">
@@ -153,7 +193,6 @@ router.get('/:username', async (req, res) => {
       </p>
     </div>
 
-    <!-- Modal -->
     <div id="bio-overlay"></div>
     <div id="bio-modal">
       <h3>Edit Bio</h3>
