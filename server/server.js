@@ -67,6 +67,10 @@ app.use(
       "https://openmediamap.com",
       "http://www.openmediamap.com",
       "https://www.openmediamap.com",
+      "http://localhost:5500",           // ADD THIS
+      "http://127.0.0.1:5500",          // ADD THIS
+      "http://localhost:3000",           // ADD THIS (if you use other ports)
+      "http://127.0.0.1:3000"           // ADD THIS
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
