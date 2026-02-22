@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recent Contributions</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script type="module" src="auth.js"></script>
+  <link rel="icon" type="image/x-icon" href="logos/favicon2.png">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRV1RVTQ89"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-YRV1RVTQ89');
+  </script>
+</head>
+<body>
+
+<!-- TOPNAV -->
+<div class="topnav">
+  <a href="forum.html">
+    <img src="logos/logo2.png" class="logo2" alt="Logo">
+  </a>
+
+  <div class="nav-links">
+    <div class="topnav-left">
+      <a class="page" href="index.html">Home</a>
+      <a class="page" href="map.html">Map</a>
+      <a class="page" href="database.html">Database</a>
+      <a class="page" href="contribute.html">Contribute</a>
+      <a class="page" href="about.html">About</a>
+      <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+    </div>
+
+    <div class="topnav-right">
+      <div id="topnav-auth">
+        <a class="page" href="login.html" id="login-link">Login</a>
+      </div>
+      <a class="page" href="forum.html">Forum</a>
+    </div>
+  </div>
+</div>
+
+<div class="main-forum-layout">
+
+  <nav class="vertical-tabs" role="tablist" aria-orientation="vertical">
+    <div id="user-link-container" class="login-link">
+      <a href="login.html" id="login-link">Login</a>
+    </div>
+
+    <a href="forum.html" role="tab" class="tab">Forum</a>
+    <a href="recent.html" role="tab" class="tab tab-active">Recent Contributions</a>
+  </nav>
+
+  <main class="forumcontent" role="tabpanel">
+    <header class="recent-header">
+      <h1>Recent Contributions</h1>
+      <p class="recent-subtitle">Latest submissions and edits from the community</p>
+    </header>
+
+    <div class="recent-filters">
+      <label class="filter-label">
+        Show:
+        <select id="activityFilter" class="filter-select">
+          <option value="all">All Activity</option>
+          <option value="submissions">New Submissions</option>
+          <option value="edits">Edits Only</option>
+        </select>
+      </label>
+
+      <label class="filter-label">
+        Limit:
+        <select id="limitFilter" class="filter-select">
+          <option value="25">25 items</option>
+          <option value="50" selected>50 items</option>
+          <option value="100">100 items</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="activityFeed" class="activity-feed">
+      <div class="activity-loading">
+        <p>Loading recent contributions...</p>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script type="module">
+  import { API_BASE_URL } from './config.js';
+
+  let allActivities = [];
+
+  // Helper functions
+  function escapeHtml(s) {
+    return String(s ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function buildUserLink(username) {
+    const u = String(username ?? '');
+    const ok = /^[a-zA-Z0-9_]{3,30}$/.test(u);
+    if (!ok) return escapeHtml(u) || 'Unknown';
+    return `<a href="/user/${encodeURIComponent(u)}" class="user-link">@${escapeHtml(u)}</a>`;
+  }
+
+  function formatTimeAgo(timestamp) {
+    const now = new Date();
+    const then = new Date(timestamp);
+    const seconds = Math.floor((now - then) / 1000);
+
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+    if (seconds < 2592000) return `${Math.floor(seconds / 604800)}w ago`;
+    return then.toLocaleDateString();
+  }
+
+  function formatDate(year, month, day, estimated) {
+    if (!year) return 'Undated';
+    let dateStr = `${year}`;
+    if (month) {
+      const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
+      dateStr = `${monthName} ${year}`;
+      if (day) dateStr = `${monthName} ${day}, ${year}`;
+    }
+    return estimated ? `c. ${dateStr}` : dateStr;
+  }
+
+  function truncateText(text, maxLength = 100) {
+    if (!text || text.length <= maxLength) return text;
+    return text.slice(0, maxLength).trim() + '...';
+  }
+
+  // Fetch all activity
+  async function loadActivities() {
+    try {
+      const filterType = document.getElementById('activityFilter').value;
+      const limit = parseInt(document.getElementById('limitFilter').value);
+      
+      // Use the efficient backend endpoint
+      const response = await fetch(`${API_BASE_URL}/api/submissions/recent-activity?type=${filterType}&limit=${limit}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const activities = await response.json();
+      
+      // Transform data to match our format
+      allActivities = activities.map(activity => ({
+        type: activity.activity_type,
+        id: activity.submission_id,
+        user: activity.username,
+        timestamp: activity.activity_timestamp,
+        caption: activity.caption,
+        year: activity.year,
+        month: activity.month,
+        day: activity.day,
+        estimated: activity.estimated,
+        photo_url: activity.photo_url,
+        edit_summary: activity.edit_summary,
+        revision_number: activity.revision_number
+      }));
+
+      renderActivities();
+
+    } catch (err) {
+      console.error('Failed to load activities:', err);
+      document.getElementById('activityFeed').innerHTML = 
+        '<div class="activity-error"><p>Failed to load recent contributions. Please try again later.</p></div>';
+    }
+  }
+
+  function renderActivities() {
+    const feed = document.getElementById('activityFeed');
+    
+    if (allActivities.length === 0) {
+      feed.innerHTML = '<div class="activity-empty"><p>No contributions found.</p></div>';
+      return;
+    }
+
+    const html = allActivities.map(activity => {
+      const timeAgo = formatTimeAgo(activity.timestamp);
+      const userLink = buildUserLink(activity.user);
+      const recordLink = `database.html?id=${activity.id}`;
+      const photoDate = formatDate(activity.year, activity.month, activity.day, activity.estimated);
+      const caption = truncateText(activity.caption);
+      
+      if (activity.type === 'submission') {
+        return `
+          <div class="activity-item activity-submission">
+            <div class="activity-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14m-7-7h14"/>
+              </svg>
+            </div>
+            <div class="activity-content">
+              <div class="activity-header">
+                ${userLink} <span class="activity-action">submitted a new record</span>
+                <span class="activity-time">${escapeHtml(timeAgo)}</span>
+              </div>
+              <div class="activity-body">
+                <a href="${recordLink}" class="activity-link">
+                  <div class="activity-preview">
+                    ${activity.photo_url ? `
+                      <img src="${escapeHtml(activity.photo_url)}" alt="Photo" class="activity-thumb">
+                    ` : ''}
+                    <div class="activity-details">
+                      <div class="activity-caption">${escapeHtml(caption)}</div>
+                      <div class="activity-meta">ID: ${activity.id} • ${escapeHtml(photoDate)}</div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="activity-item activity-edit">
+            <div class="activity-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+            <div class="activity-content">
+              <div class="activity-header">
+                ${userLink} <span class="activity-action">edited a record</span>
+                <span class="activity-time">${escapeHtml(timeAgo)}</span>
+              </div>
+              ${activity.edit_summary ? `
+                <div class="activity-edit-summary">
+                  "${escapeHtml(activity.edit_summary)}"
+                </div>
+              ` : ''}
+              <div class="activity-body">
+                <a href="${recordLink}" class="activity-link">
+                  <div class="activity-preview">
+                    ${activity.photo_url ? `
+                      <img src="${escapeHtml(activity.photo_url)}" alt="Photo" class="activity-thumb">
+                    ` : ''}
+                    <div class="activity-details">
+                      <div class="activity-caption">${escapeHtml(caption)}</div>
+                      <div class="activity-meta">ID: ${activity.id} • ${escapeHtml(photoDate)}</div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }).join('');
+
+    feed.innerHTML = html;
+  }
+
+  // Event listeners - reload data when filters change
+  document.getElementById('activityFilter').addEventListener('change', loadActivities);
+  document.getElementById('limitFilter').addEventListener('change', loadActivities);
+
+  // Load on page load
+  document.addEventListener('DOMContentLoaded', loadActivities);
+</script>
+
+</body>
+</html>

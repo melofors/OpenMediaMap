@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" href="logos/favicon2.png" type="image/x-icon"/>
+
+  <!-- Firebase / Auth -->
+  <script type="module" src="auth.js"></script>
+
+  <!-- Admin logic -->
+  <script type="module" src="admin.js"></script>
+</head>
+
+<body class="admin">
+
+  <!-- Username display (optional, used elsewhere) -->
+  <span id="username-display" class="username-ellipse"></span>
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <a href="index.html">
+      <img src="logos/logo.png" class="logo" alt="Logo">
+    </a>
+
+    <div class="nav-links">
+      <div class="topnav-left">
+        <a class="page" href="map.html">Map</a>
+        <a class="page" href="database.html">Database</a>
+        <a class="page" href="contribute.html">Contribute</a>
+        <a class="page" href="about.html">About</a>
+        <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+      </div>
+
+      <div class="topnav-right">
+        <div id="topnav-auth">
+          <a class="page" href="login.html" id="login-link">Login</a>
+        </div>
+        <a class="page" href="forum.html">Forum</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================= -->
+  <!-- MAIN ADMIN CONTENT (HIDDEN UNTIL AUTH) -->
+  <!-- ========================= -->
+  <div id="admin-content" style="display:none;">
+    <div class="contributecontent">
+
+      <h2>Admin Dashboard</h2>
+
+      <!-- ========================= -->
+      <!-- PENDING SUBMISSIONS -->
+      <!-- ========================= -->
+      <p class="admin">Pending Submissions</p>
+      <hr class="top"/>
+
+      <div id="submissions-container">
+        <!-- Filled dynamically by admin.js -->
+      </div>
+
+      <!-- ========================= -->
+      <!-- SOFT DELETE RECORD -->
+      <!-- ========================= -->
+      <p class="admin" style="margin-top:3rem;">Delete Record</p>
+      <hr class="top"/>
+
+      <div id="admin-actions">
+        <div class="input-row">
+          <label for="delete-id">Record ID to delete:</label>
+          <input type="number" id="delete-id" min="1" />
+        </div>
+
+        <br>
+
+        <label for="delete-reason">Reason for deletion:</label><br>
+        <textarea
+          id="delete-reason"
+          rows="3"
+          cols="50"
+          placeholder="Enter reason..."
+        ></textarea>
+
+        <br><br>
+
+        <button id="delete-record-btn">Delete Record</button>
+
+        <p id="delete-status"></p>
+      </div>
+
+      <!-- ========================= -->
+      <!-- ADMIN ACTION LOGS -->
+      <!-- ========================= -->
+      <p class="admin" style="margin-top:3rem;">Admin Action Logs</p>
+      <hr class="top"/>
+
+      <div id="admin-logs">
+        <p><em>Logs will appear here.</em></p>
+        <!-- Rendering comes next -->
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

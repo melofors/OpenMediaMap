@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# env secrets
+.env
+server/.env
+client/.env
+
+# build/artifacts
+*.tar.gz
+dist/
+build/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Firebase / Google service account key
+server/serviceAccountKey.json

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+          integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+          crossorigin=""/>
+    <link rel="stylesheet" href="style.css"/>
+    <script type="module" src="auth.js"></script>
+    <!-- fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="logos/favicon2.png">
+</head>
+<body class="about">
+    <span id="username-display" class="username-ellipse"></span>
+    <!-- TOPNAV -->
+    <div class="topnav">
+            <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo"></a>
+            <div class="nav-links">
+                <div class="topnav-left">
+                    <a class="page" href="map.html">Map</a>
+                    <a class="page" href="database.html">Database</a>
+                    <a class="page" href="contribute.html">Contribute</a>
+                    <a class="page" href="about.html">About</a>
+                    <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+                </div>
+                <div class="topnav-right">
+                    <div id="topnav-auth"> 
+                        <a class="page" href="login.html" id="login-link">Login</a>
+                    </div>
+                    <a class="page" href="forum.html">Forum</a>
+                </div>
+            </div>
+        </div>
+
+    <div class="aboutcontent">
+        <h2>About</h2>
+
+        <p class="prose">
+            <b>OpenMediaMap</b> is an open, free, and crowdsourced project dedicated to digitizing and geo-locating old photographs, and preserving information about them. Submissions are allowed for photographs dated before January 1, 1930.
+        </p>
+
+        <p class="prose">
+            Anybody can <a href="contribute.html"><b>contribute</b></a> a photograph from any source available to them through a simple submission form. By adding coordinates to a record, the photograph is then made visible on the public <a href="map.html"><b>map</b></a>.
+        </p>
+
+        <p class="prose">
+            If exact coordinates are unknown, submissions will still remain visible in the public <a href="database.html"><b>database</b></a>, which can be attached with research notes. Other users can view these records and notes and can attempt to geo-locate them. (A post-submission <b>editing</b> system is currently in development)
+        </p>
+
+        <p class="prose">
+            This process is designed to be as frictionless as possible, allowing anybody to contribute, from hobbyist researchers, to family genealogists, to professional researchers. (A <b>tagging system</b> will be implemented to identify photographs owned by different people or organizations.)
+        </p>
+
+        <p class="prose">
+            Submissions become visible on the site after a brief review period (typically under 24 hours) to allow trusted users to prevent spam and maintain archival quality. (A <b>permission-based review system</b> is in development, with logged actions and contributor visibility.)
+        </p>
+
+        <h2>The Pre-1900 Project</h2>
+
+        <p class="prose">
+            OpenMediaMap’s flagship campaign, <b>The Pre-1900 Project</b>, focuses primarily on the 19th century, with the goal of digitizing as many photographs from this period as possible.
+        </p>
+
+        <p class="prose">
+            By concentrating efforts on early photography, contributors can collectively build the first open, global catalog of 19th-century photographs — free from paywalls and institutional boundaries.
+        </p>
+
+        <h2>Policies</h2>
+
+        <p class="prose">We operate under the following principles:</p>
+
+        <ul>
+            <li>
+                <p class="prose">
+                    <b>Remain Free:</b> No paywalls. This archive is a crowdsourced, non-profit project inspired by initiatives such as Wikipedia and OpenStreetMap.
+                </p>
+            </li>
+            <li>
+                <p class="prose">
+                    <b>Remain Open:</b> With strong backend infrastructure, security measures, and dedicated developers, the archive is built to remain accessible for generations.
+                </p>
+            </li>
+            <li>
+                <p class="prose">
+                    <b>Remain Reliable:</b> A dedicated community helps maintain accuracy, discourage abuse through penalties, and enable edit rollbacks where necessary.
+                </p>
+            </li>
+        </ul>
+
+        <p class="prose">
+            Begin contributing <a href="contribute.html"><b>here</b></a>.
+        </p>
+</div>
+
+
+    <!-- FOOTER -->
+    <footer class="footerfront">
+    <div class="footer-inner">
+
+        <div class="footer-brand">
+        <p class="footer-title">OpenMediaMap™</p>
+        <p class="footer-tagline">Mapping and preserving historical media</p>
+        </div>
+
+        <nav class="footer-links">
+        <a href="map.html">Map</a>
+        <a href="database.html">Database</a>
+        <a href="contribute.html">Contribute</a>
+        <a href="about.html">About</a>
+        <a href="forum.html">Forum</a>
+        </nav>
+
+    </div>
+    </footer>
+
+</body>
+</html>

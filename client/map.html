@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenMediaMap</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin=""/>
+    <link rel="stylesheet" href="style.css"/>
+    <script type="module" src="auth.js"></script>
+    <link rel="icon" type="image/x-icon" href="logos/favicon2.png">
+    
+    <style>
+        /* Remove footer space */
+        body.map {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .mainmap {
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        /* Legend Sidebar - Centered vertically */
+        .legend-sidebar {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 8px;
+            padding: 12px 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .legend-sidebar h3 {
+            margin: 0 0 10px 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.7);
+            text-transform: none;     /* ✅ */
+            letter-spacing: 0.2px;    /* subtle, optional */
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 12px;           /* was 11px */
+            color: rgba(0, 0, 0, 0.65);
+            font-weight: 500;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legend-item img {
+            width: 14px;
+            height: auto;
+            margin-right: 7px;
+            flex-shrink: 0;
+        }
+        
+        .legend-item.legend-1700s {
+            align-items: center;
+        }
+        
+        /* Filter Panel - Bottom */
+        .filter-panel {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 8px;
+            padding: 12px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 380px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .filter-panel label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.7);
+            margin-bottom: 6px;
+            text-transform: none;   /* ✅ */
+            letter-spacing: 0.2px;
+        }
+        
+        .filter-panel #rangeLabel {
+            font-weight: 700;
+            color: #0078a8;
+            text-transform: none;
+        }
+        
+        /* Slider Styling */
+        .filter-panel input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(68, 68, 68, 0.4);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        
+        .filter-panel input[type="range"]:hover {
+            background: rgba(85, 85, 85, 0.5);
+        }
+        
+        .filter-panel input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: rgba(170, 170, 170, 0.9);
+            border: none;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .filter-panel input[type="range"]::-webkit-slider-thumb:hover {
+            background: rgba(221, 221, 221, 0.95);
+        }
+        
+        .filter-panel input[type="range"]::-moz-range-thumb {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: rgba(170, 170, 170, 0.9);
+            border: none;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .filter-panel input[type="range"]::-moz-range-thumb:hover {
+            background: rgba(221, 221, 221, 0.95);
+        }
+        
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            gap: 5px;
+        }
+        
+        .checkbox-row input[type="checkbox"] {
+            cursor: pointer;
+        }
+        
+        .checkbox-row label {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+            cursor: pointer;
+            color: rgba(0, 0, 0, 0.65);
+        }
+
+        /* --- Checkbox: subtle glassy look --- */
+        .checkbox-row input[type="checkbox"]{
+        appearance: none;
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        background: rgba(255, 255, 255, 0.18); /* ✅ lighter, glassy */
+        box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4);
+        display: inline-grid;
+        place-content: center;
+        }
+
+        /* Hover: barely perceptible */
+        .checkbox-row input[type="checkbox"]:hover{
+        background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Checked state: neutral (no blue) */
+        .checkbox-row input[type="checkbox"]:checked{
+        background: rgba(255, 255, 255, 0.35);
+        border-color: rgba(0, 0, 0, 0.35);
+        }
+
+        /* Checkmark */
+        .checkbox-row input[type="checkbox"]:checked::after{
+        content: "";
+        width: 8px;
+        height: 5px;
+        border-left: 2px solid rgba(0, 0, 0, 0.7);
+        border-bottom: 2px solid rgba(0, 0, 0, 0.7);
+        transform: rotate(-45deg);
+        margin-top: -1px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .legend-sidebar {
+                right: 10px;
+                padding: 10px 12px;
+            }
+            
+            .legend-sidebar h3 {
+                font-size: 10px;
+            }
+            
+            .legend-item {
+                font-size: 10px;
+                margin-bottom: 5px;
+            }
+            
+            .legend-item img {
+                width: 12px;
+                margin-right: 6px;
+            }
+            
+            .filter-panel {
+                min-width: calc(100% - 30px);
+                left: 15px;
+                transform: none;
+            }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRV1RVTQ89"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YRV1RVTQ89');
+    </script>
+</head>
+<body class="map">
+    <span id="username-display" class="username-ellipse"></span>
+    
+    <!-- TOPNAV -->
+    <div class="topnav">
+        <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo"></a>
+        <div class="nav-links">
+            <div class="topnav-left">
+                <a class="page" href="map.html">Map</a>
+                <a class="page" href="database.html">Database</a>
+                <a class="page" href="contribute.html">Contribute</a>
+                <a class="page" href="about.html">About</a>
+                <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+            </div>
+            <div class="topnav-right">
+                <div id="topnav-auth"> 
+                    <a class="page" href="login.html" id="login-link">Login</a>
+                </div>
+                <a class="page" href="forum.html">Forum</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAP -->
+    <div class="mainmap custom-popup" id="map"></div>
+    
+    <!-- LEGEND SIDEBAR -->
+    <div class="legend-sidebar">
+        <h3>Legend</h3>
+        <div class="legend-item legend-1700s">
+            <img src="markers/1700s and below.png" alt="1700s or earlier">
+            <span>1700s or earlier</span>
+        </div>
+        <div class="legend-item">
+            <img src="markers/1800s early.png" alt="early 1800s">
+            <span>Early 1800s</span>
+        </div>
+        <div class="legend-item">
+            <img src="markers/1800s mid.png" alt="mid 1800s">
+            <span>Mid-1800s</span>
+        </div>
+        <div class="legend-item">
+            <img src="markers/1800s late.png" alt="late 1800s">
+            <span>Late 1800s</span>
+        </div>
+        <div class="legend-item">
+            <img src="markers/1900s.png" alt="1900s">
+            <span>1900s</span>
+        </div>
+        <div class="legend-item">
+            <img src="markers/1910s.png" alt="1910s">
+            <span>1910s</span>
+        </div>
+        <div class="legend-item">
+            <img src="markers/1920s.png" alt="1920s">
+            <span>1920s</span>
+        </div>
+        <div class="legend-item">
+            <img src="markers/1930s.png" alt="1930s">
+            <span>1930s</span>
+        </div>
+    </div>
+    
+    <!-- FILTER PANEL -->
+    <div class="filter-panel">
+        <label for="yearRange">
+            Filter by year: <span id="rangeLabel">Before 1900</span>
+        </label>
+        <input type="range" id="yearRange" min="1830" max="1930" value="1900" step="1">
+        
+        <div class="checkbox-row">
+            <input type="checkbox" id="includeUndated">
+            <label for="includeUndated">Include undated</label>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+            integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+            crossorigin=""></script>
+    <script type="module" src="map.js"></script>
+
+    <!-- GLOBAL LIGHTBOX ROOT (must be last thing inside body) -->
+    <div id="imageModal">
+        <span class="close">&times;</span>
+        <img id="modalImage" alt="Full size photo">
+    </div>
+
+</body>
+</html>
