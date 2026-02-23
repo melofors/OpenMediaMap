@@ -67,10 +67,10 @@ app.use(
       "https://openmediamap.com",
       "http://www.openmediamap.com",
       "https://www.openmediamap.com",
-      "http://localhost:5500",           // ADD THIS
-      "http://127.0.0.1:5500",          // ADD THIS
-      "http://localhost:3000",           // ADD THIS (if you use other ports)
-      "http://127.0.0.1:3000"           // ADD THIS
+      "http://localhost:5500",
+      "http://127.0.0.1:5500",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
@@ -110,7 +110,11 @@ app.use("/admin", express.static(path.join(__dirname, "admin")));
 // -----------------------------
 // Routes
 // -----------------------------
+// CORRECT - /api/user/:username
+app.use("/api/user", userRoutes);
+// Keep old /user/:username for server-rendered
 app.use("/user", userRoutes);
+
 app.use("/api/submissions", require("./routes/submissions"));
 
 app.get("/api/admin/actions", requireAdmin, async (req, res) => {
