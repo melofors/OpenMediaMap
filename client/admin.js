@@ -303,7 +303,10 @@ function renderAdminLogs(logs) {
     tr.innerHTML = `
       <td>${new Date(log.created_at).toLocaleString()}</td>
       <td>${log.admin_username}</td>
-      <td><span class="${actionClass}">${log.action_type}</span></td>
+      <td>
+        <span class="${actionClass}">${log.action_type}</span>
+        ${log.reason ? `<br><span style="font-size:0.82rem; color:#6b7280; font-weight:normal;">${escapeHtml(log.reason)}</span>` : ''}
+      </td>
       <td>${log.record_id}</td>
     `;
     tbody.appendChild(tr);

@@ -122,7 +122,7 @@ app.use("/api/submissions", require("./routes/submissions"));
 app.get("/api/admin/actions", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, admin_username, action_type, record_id, created_at
+      SELECT id, admin_username, action_type, record_id, created_at, reason
       FROM admin_actions
       ORDER BY created_at DESC
       LIMIT 500

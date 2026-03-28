@@ -10,12 +10,12 @@ const requireAuth = require('../middleware/requireAuth');
 // =============================================================
 // Helper: Log admin actions
 // =============================================================
-async function logAdminAction(adminUsername, actionType, recordId) {
+async function logAdminAction(adminUsername, actionType, recordId, reason = null) {
   try {
     await db.query(
-      `INSERT INTO admin_actions (admin_username, action_type, record_id)
-       VALUES ($1, $2, $3)`,
-      [adminUsername, actionType, recordId]
+      `INSERT INTO admin_actions (admin_username, action_type, record_id, reason)
+       VALUES ($1, $2, $3, $4)`,
+      [adminUsername, actionType, recordId, reason]
     );
   } catch (err) {
     console.error('Admin action log failed:', err?.message || err);
@@ -596,7 +596,7 @@ router.post('/admin/:id/soft-delete', requireAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Record not found or already deleted' });
     }
 
-    await logAdminAction(adminUsername, 'delete', id);
+    await logAdminAction(adminUsername, 'delete', id, reason);
     return res.json({ success: true });
   } catch (err) {
     console.error('Error soft deleting submission:', err?.message || err);
