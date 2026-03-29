@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>OpenMediaMap</title>
+        <title>GeoArchive</title>
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
         integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
         crossorigin=""/>
@@ -31,20 +31,20 @@
         <span id="username-display" class="username-ellipse"></span>
         <!-- TOPNAV -->
         <div class="topnav">
-            <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo"></a>
+            <a href="/"><img src="logos/logo.png" class="logo" alt="Logo"></a>
             <div class="nav-links">
                 <div class="topnav-left">
-                    <a class="page" href="map.html">Map</a>
-                    <a class="page" href="database.html">Database</a>
-                    <a class="page" href="contribute.html">Contribute</a>
-                    <a class="page" href="about.html">About</a>
-                    <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a>
+                    <a class="page" href="/map">Map</a>
+                    <a class="page" href="/database">Database</a>
+                    <a class="page" href="/contribute">Contribute</a>
+                    <a class="page" href="/about">About</a>
+                    <a id="admin-link" class="page" href="/admin" style="display:none">Admin</a>
                 </div>
                 <div class="topnav-right">
                     <div id="topnav-auth"> 
-                        <a class="page" href="login.html" id="login-link">Login</a>
+                        <a class="page" href="/login" id="login-link">Login</a>
                     </div>
-                    <a class="page" href="forum.html">Forum</a>
+                    <a class="page" href="/forum">Forum</a>
                 </div>
             </div>
         </div>
@@ -54,7 +54,7 @@
             <!-- Top brand + mission -->
             <div class="front-hero">
                 <div class="front-brand">
-                <img src="logos/logo.png" alt="OpenMediaMap logo" class="front-logo">
+                <img src="logos/logo.png" alt="GeoArchive logo" class="front-logo">
                 </div>
 
                 <p class="front-mission">
@@ -63,15 +63,15 @@
 
                 <p class="front-counter">
                 Digitized and geolocated
-                <a href="database.html"><span id="pre1900-count">—</span></a>
+                <a href="/database"><span id="pre1900-count">—</span></a>
                 photographs dated ≤ 1900
-                <a href="contribute.html">and counting</a>…
+                <a href="/contribute">and counting</a>…
                 </p>
             </div>
 
             <!-- Map -->
             <div class="minimapcontainer">
-                <a class="minimap-link" href="map.html" aria-label="Open full map">
+                <a class="minimap-link" href="/map" aria-label="Open full map">
                     <div class="minimap custom-popup minimap-preview" id="map"></div>
 
                     <div class="minimap-overlay">
@@ -85,7 +85,7 @@
 
             <!-- After map CTA -->
             <p class="front-volunteers">
-                We depend on volunteers from all over the world. Learn <a href="contribute.html">how to add your first photo</a>.
+                We depend on volunteers from all over the world. Learn <a href="/contribute">how to add your first photo</a>.
             </p>
 
         </div>
@@ -95,16 +95,16 @@
         <div class="footer-inner">
 
             <div class="footer-brand">
-            <p class="footer-title">OpenMediaMap™</p>
+            <p class="footer-title">GeoArchive™</p>
             <p class="footer-tagline">Mapping and preserving historical media</p>
             </div>
 
             <nav class="footer-links">
-            <a href="map.html">Map</a>
-            <a href="database.html">Database</a>
-            <a href="contribute.html">Contribute</a>
-            <a href="about.html">About</a>
-            <a href="forum.html">Forum</a>
+            <a href="/map">Map</a>
+            <a href="/database">Database</a>
+            <a href="/contribute">Contribute</a>
+            <a href="/about">About</a>
+            <a href="/forum">Forum</a>
             </nav>
 
         </div>

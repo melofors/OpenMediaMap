@@ -31,20 +31,20 @@
  
   <!-- TOPNAV --> 
   <div class="topnav"> 
-    <a href="index.html"><img src="logos/logo.png" class="logo" alt="Logo"></a> 
+    <a href="/"><img src="logos/logo.png" class="logo" alt="Logo"></a> 
     <div class="nav-links"> 
       <div class="topnav-left"> 
-        <a class="page" href="map.html">Map</a> 
-        <a class="page" href="database.html">Database</a> 
-        <a class="page" href="contribute.html">Contribute</a> 
-        <a class="page" href="about.html">About</a> 
-        <a id="admin-link" class="page" href="admin.html" style="display:none">Admin</a> 
+        <a class="page" href="/map">Map</a> 
+        <a class="page" href="/database">Database</a> 
+        <a class="page" href="/contribute">Contribute</a> 
+        <a class="page" href="/about">About</a> 
+        <a id="admin-link" class="page" href="/admin" style="display:none">Admin</a> 
       </div> 
       <div class="topnav-right"> 
         <div id="topnav-auth"> 
-          <a class="page" href="login.html" id="login-link">Login</a> 
+          <a class="page" href="/login" id="login-link">Login</a> 
         </div> 
-        <a class="page" href="forum.html">Forum</a> 
+        <a class="page" href="/forum">Forum</a> 
       </div> 
     </div> 
   </div> 
@@ -531,14 +531,6 @@
  
         if (String(id) === targetId && !highlightApplied) {
           row.classList.add('highlighted-row');
-          setTimeout(() => {
-            row.scrollIntoView({ behavior: 'instant', block: 'center' });
-            setTimeout(() => row.classList.add('fade-out'), 250);
-            setTimeout(() => {
-              row.classList.remove('highlighted-row', 'fade-out');
-              highlightApplied = true;
-            }, 500);
-          }, 100);
         }
  
         tbody.appendChild(row); 
@@ -555,6 +547,31 @@
           }); 
         } 
       }); 
+
+      // Scroll to highlighted row after ALL rows and images are in the DOM
+      if (targetId && !highlightApplied) {
+        const targetRow = tbody.querySelector(`tr[data-id="${targetId}"]`);
+        if (targetRow) {
+          const allImages = Array.from(tbody.querySelectorAll('img'));
+          const waitForImages = allImages.map(img => {
+            if (img.complete) return Promise.resolve();
+            return new Promise(resolve => {
+              img.addEventListener('load', resolve, { once: true });
+              img.addEventListener('error', resolve, { once: true });
+              setTimeout(resolve, 4000);
+            });
+          });
+
+          Promise.all(waitForImages).then(() => {
+            targetRow.scrollIntoView({ behavior: 'instant', block: 'center' });
+            setTimeout(() => targetRow.classList.add('fade-out'), 250);
+            setTimeout(() => {
+              targetRow.classList.remove('highlighted-row', 'fade-out');
+              highlightApplied = true;
+            }, 500);
+          });
+        }
+      }
 
       // NEW: Add sort click handlers to headers
       updateSortArrows();
@@ -751,16 +768,16 @@
   <div class="footer-inner"> 
  
       <div class="footer-brand"> 
-      <p class="footer-title">OpenMediaMap™</p> 
+      <p class="footer-title">GeoArchive™</p> 
       <p class="footer-tagline">Mapping and preserving historical media</p> 
       </div> 
  
       <nav class="footer-links"> 
-      <a href="map.html">Map</a> 
-      <a href="database.html">Database</a> 
-      <a href="contribute.html">Contribute</a> 
-      <a href="about.html">About</a> 
-      <a href="forum.html">Forum</a> 
+      <a href="/map">Map</a> 
+      <a href="/database">Database</a> 
+      <a href="/contribute">Contribute</a> 
+      <a href="/about">About</a> 
+      <a href="/forum">Forum</a> 
       </nav> 
  
   </div> 

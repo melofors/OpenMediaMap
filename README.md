@@ -1,2 +1,2 @@
-# OpenMediaMap
+# GeoArchive
 Crowdsourced historical media project
