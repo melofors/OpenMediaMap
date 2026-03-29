@@ -529,15 +529,17 @@
           </td> 
         `; 
  
-        if (String(id) === targetId && !highlightApplied) { 
-          row.classList.add('highlighted-row'); 
-          setTimeout(() => row.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); 
-          setTimeout(() => row.classList.add('fade-out'), 250); 
-          setTimeout(() => { 
-            row.classList.remove('highlighted-row', 'fade-out'); 
-            highlightApplied = true; 
-          }, 500); 
-        } 
+        if (String(id) === targetId && !highlightApplied) {
+          row.classList.add('highlighted-row');
+          setTimeout(() => {
+            row.scrollIntoView({ behavior: 'instant', block: 'center' });
+            setTimeout(() => row.classList.add('fade-out'), 250);
+            setTimeout(() => {
+              row.classList.remove('highlighted-row', 'fade-out');
+              highlightApplied = true;
+            }, 500);
+          }, 100);
+        }
  
         tbody.appendChild(row); 
  
@@ -1454,12 +1456,20 @@
 
     const id = row.dataset.id;
 
+    // Check auth
     let authToken = null;
     try {
       const user = auth.currentUser;
-      if (user) authToken = await user.getIdToken();
+      if (user) {
+        authToken = await user.getIdToken();
+      }
     } catch (err) {
       console.error('Auth error:', err);
+    }
+
+    if (!authToken) {
+      alert('You must be logged in to view revision history.');
+      return;
     }
 
     // Open modal and show loading
@@ -1472,7 +1482,9 @@
     try {
       // Get revision history
       const revisionsRes = await fetch(`${API_BASE_URL}/api/submissions/${id}/revisions`, {
-        headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {}
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
       });
 
       if (!revisionsRes.ok) {
