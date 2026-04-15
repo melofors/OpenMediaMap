@@ -2886,8 +2886,9 @@ body.database #historyModal .modal-content::-webkit-scrollbar-thumb:hover {
 /* User link in vertical navbar */
 
 #user-link-container {
-  opacity: 0;           /* start hidden */
+  opacity: 0;
   transition: opacity 0.3s ease;
+  min-height: 20px;  /* reserve space before content loads */
 }
 #user-link-container.visible {
   opacity: 1;           /* fade in once ready */
