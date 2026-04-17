@@ -39,6 +39,78 @@ router.post('/bio', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/user — list all users with stats
+router.get('/', async (req, res) => {
+  const db = admin.firestore();
+  const pgDB = require('../models/db');
+
+  try {
+    // Get submission counts from postgres
+    const pgResult = await pgDB.query(`
+      SELECT user_id, COUNT(*) as submission_count
+      FROM submissions
+      WHERE status = 'approved' AND deleted = FALSE
+      GROUP BY user_id
+    `);
+
+    const submissionMap = {};
+    pgResult.rows.forEach(row => {
+      submissionMap[row.user_id] = Number(row.submission_count);
+    });
+
+    // Get edit counts from postgres
+    const editResult = await pgDB.query(`
+      SELECT editor_username, COUNT(*) as edit_count
+      FROM submission_revisions
+      WHERE revision_number > 0
+      GROUP BY editor_username
+    `);
+
+    const editMap = {};
+    editResult.rows.forEach(row => {
+      editMap[row.editor_username] = Number(row.edit_count);
+    });
+
+    // Get all usernames that have activity
+    const allUsernames = [...new Set([
+      ...Object.keys(submissionMap),
+      ...Object.keys(editMap)
+    ])];
+
+    // Fetch user docs from Firestore
+    const usersRef = db.collection('users');
+    const users = [];
+
+    for (const username of allUsernames) {
+      if (!isValidUsername(username)) continue;
+      try {
+        const snap = await usersRef.where('username', '==', username).limit(1).get();
+        const created_at = snap.empty ? null : (snap.docs[0].data().created_at?.toDate().toISOString() ?? null);
+        users.push({
+          username,
+          created_at,
+          submission_count: submissionMap[username] || 0,
+          edit_count: editMap[username] || 0
+        });
+      } catch {
+        users.push({
+          username,
+          created_at: null,
+          submission_count: submissionMap[username] || 0,
+          edit_count: editMap[username] || 0
+        });
+      }
+    }
+
+    users.sort((a, b) => b.submission_count - a.submission_count);
+
+    return res.json(users);
+  } catch (err) {
+    console.error('Error fetching user list:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // GET /api/user/:username — fetch user profile
 // MUST be last since /:username matches anything
 router.get('/:username', async (req, res) => {
