@@ -117,7 +117,7 @@
 
         <div class="checkbox-row">
           <label><input type="checkbox" id="estimatedDate" name="estimated" /> Estimated Date (<abbr title="circa">c.</abbr>)</label>
-          <label><input type="checkbox" id="unknownDate" /> Unknown Date<span style="color:gray;">*</span></label>
+          <label><input type="checkbox" id="unknownDate" /> Unknown Date<span id="unknownDateAsterisk" style="color:gray; display:none;">*</span></label>
         </div>
 
         <p id="unknownDateNote">
@@ -514,6 +514,8 @@
           responseEl.textContent = "✅ Record submitted.";
           responseEl.style.color = "green";
           e.target.reset();
+          preview.src = "";
+          preview.style.display = "none";
         } else {
           const error = await res.json().catch(() => ({}));
           responseEl.textContent = `❌ Error: ${error.error || error.message || "Submission failed."}`;
@@ -534,6 +536,7 @@
   <script>
     document.getElementById("unknownDate").addEventListener("change", function () {
       const isUnknown = this.checked;
+      document.getElementById('unknownDateAsterisk').style.display = isUnknown ? 'inline' : 'none';
 
       const year = document.getElementById("year");
       const month = document.getElementById("month");
