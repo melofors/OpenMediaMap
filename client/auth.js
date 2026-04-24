@@ -33,7 +33,7 @@ function isValidUsername(username) {
 
 function safeUserPath(username) {
   // Only build /user/... links for validated usernames
-  if (!isValidUsername(username)) return "/login.html";
+  if (!isValidUsername(username)) return "/login";
   return `/user/${encodeURIComponent(username)}`;
 }
 
@@ -164,13 +164,13 @@ onAuthStateChanged(auth, async (user) => {
       a.onclick = async (e) => {
         e.preventDefault();
         await signOut(auth);
-        window.location.href = "/login.html";
+        window.location.href = "/login";
       };
 
       topnavAuth.appendChild(a);
     } else {
       const a = document.createElement("a");
-      a.href = "/login.html";
+      a.href = "/login";
       a.id = "topnav-login-link";
       a.className = "page";
       a.textContent = "Login";
@@ -215,7 +215,7 @@ onAuthStateChanged(auth, async (user) => {
         e.preventDefault();
         await signOut(auth);
         // optional: send them to login page
-        window.location.href = "/login.html";
+        window.location.href = "/login";
       };
 
       userLinkContainer.appendChild(aUser);
@@ -223,7 +223,7 @@ onAuthStateChanged(auth, async (user) => {
       userLinkContainer.appendChild(aLogout);
     } else {
       const aLogin = document.createElement("a");
-      aLogin.href = "/login.html";
+      aLogin.href = "/login";
       aLogin.textContent = "Login";
       aLogin.className = "page";
       userLinkContainer.appendChild(aLogin);
