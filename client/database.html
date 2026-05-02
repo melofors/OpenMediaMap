@@ -244,12 +244,11 @@
         let coords = [];
 
         if (osmType === 'relation') {
-          // Find the outer member
-          const outer = element.members?.find(m => m.role === 'outer' && m.geometry);
-          if (outer?.geometry) {
-            coords = outer.geometry.map(p => [p.lat, p.lon]);
+          // Collect ALL outer members and concatenate into one polygon
+          const outers = element.members?.filter(m => m.role === 'outer' && m.geometry) || [];
+          if (outers.length > 0) {
+            coords = outers.flatMap(m => m.geometry.map(p => [p.lat, p.lon]));
           } else if (element.members) {
-            // Fallback: use first member with geometry
             const first = element.members.find(m => m.geometry);
             if (first?.geometry) coords = first.geometry.map(p => [p.lat, p.lon]);
           }
