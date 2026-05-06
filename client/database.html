@@ -90,7 +90,7 @@
 
         <!-- Sort by nearest -->
         <div class="filter-toggles" aria-label="Filter toggles">
-          <label class="cb">
+          <label class="cb-plain">
             <input type="checkbox" id="nearestCheckbox">
             <span>Sort by nearest to me</span>
           </label>
@@ -99,7 +99,7 @@
         <!-- Right side: show meta -->
         <div class="filter-right">
           <div class="meta-anchor">
-            <label class="cb cb-meta">
+            <label class="cb-plain cb-meta">
               <input type="checkbox" id="showMeta">
               <span>Show meta</span>
             </label>
@@ -171,7 +171,6 @@
     }
 
     async function fetchLocationPolygon(query) {
-      const statusEl = document.getElementById('locationStatus');
       const clearBtn = document.getElementById('locationClear');
 
       if (!query.trim()) {
@@ -202,8 +201,7 @@
         const osmId = place.osm_id;
         const displayName = place.display_name.split(',').slice(0, 2).join(',');
 
-        statusEl.textContent = `Loading boundary…`;
-        statusEl.className = 'location-status loading';
+        document.getElementById('locationLabel').innerHTML = '<span style="color:#0078a8">Loading boundary…</span>';
 
         // Step 2: Overpass — get polygon for this OSM relation
         let overpassQuery;
@@ -220,7 +218,9 @@
             [minLat, minLng], [maxLat, minLng],
             [maxLat, maxLng], [minLat, maxLng]
           ];
-          document.getElementById('locationLabel').innerHTML = `<a href="https://www.openstreetmap.org/${osmType}/${osmId}" target="_blank" rel="noopener">${displayName}</a> <span style="color:#94a3b8;font-weight:400">(OSM ${osmType} ${osmId}, approx.)</span>`;
+          const lbl1 = document.getElementById('locationLabel');
+          lbl1.className = 'active';
+          lbl1.innerHTML = `<a href="https://www.openstreetmap.org/${osmType}/${osmId}" target="_blank" rel="noopener">${displayName}</a> <span style="color:#94a3b8;font-weight:400">(OSM ${osmType} ${osmId}, approx.)</span>`;
           clearBtn.style.display = 'block';
           renderTable();
           return;
@@ -259,14 +259,15 @@
 
         locationPolygon = coords;
         window._debugPolygon = coords;
-        document.getElementById('locationLabel').innerHTML = `<a href="https://www.openstreetmap.org/${osmType}/${osmId}" target="_blank" rel="noopener">${displayName}</a> <span style="color:#94a3b8;font-weight:400">(OSM ${osmType} ${osmId})</span>`;
+        const lbl2 = document.getElementById('locationLabel');
+        lbl2.className = 'active';
+        lbl2.innerHTML = `<a href="https://www.openstreetmap.org/${osmType}/${osmId}" target="_blank" rel="noopener">${displayName}</a> <span style="color:#94a3b8;font-weight:400">(OSM ${osmType} ${osmId})</span>`;
         clearBtn.style.display = 'block';
         renderTable();
 
       } catch (err) {
         console.error('Location filter error:', err);
-        statusEl.textContent = 'Error loading boundary.';
-        statusEl.className = 'location-status error';
+        document.getElementById('locationLabel').innerHTML = '<span style="color:#ef4444">Error loading boundary.</span>';
       }
     }
 
@@ -869,7 +870,9 @@
         const val = e.target.value.trim();
         if (!val) {
           locationPolygon = null;
-          document.getElementById('locationLabel').innerHTML = '<span class="location-label-world">World</span>';
+          const lbl3 = document.getElementById('locationLabel');
+          lbl3.className = '';
+          lbl3.innerHTML = '<span class="location-label-world">World</span>';
           document.getElementById('locationClear').style.display = 'none';
           renderTable();
           return;
@@ -880,7 +883,9 @@
       document.getElementById('locationClear').addEventListener('click', () => {
         document.getElementById('locationInput').value = '';
         locationPolygon = null;
-        document.getElementById('locationLabel').innerHTML = '<span class="location-label-world">World</span>';
+        const lbl4 = document.getElementById('locationLabel');
+        lbl4.className = '';
+        lbl4.innerHTML = '<span class="location-label-world">World</span>';
         document.getElementById('locationClear').style.display = 'none';
         renderTable();
       });

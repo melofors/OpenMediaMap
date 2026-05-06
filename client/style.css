@@ -1614,6 +1614,8 @@ td.uploader-column {
   cursor: pointer;
 }
 
+.cb-plain.cb-meta { white-space: nowrap; }
+
 .cb-plain input[type="checkbox"] {
   width: 12px;
   height: 12px;
@@ -1639,6 +1641,14 @@ td.uploader-column {
 #locationLabel {
   font-weight: 800;
   color: #0078a8;
+}
+
+#locationLabel.active {
+  color: #16a34a;
+}
+
+#locationLabel.active a {
+  color: #16a34a;
 }
 
 #locationLabel a {
