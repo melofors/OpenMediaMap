@@ -159,14 +159,12 @@
     const TRUNC_LIMIT = 125;
 
     function pointInPolygon(lat, lng, polygon) {
-      // polygon stored as [lat, lon] pairs
-      // ray casting along longitude axis
       let inside = false;
       for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-        const latI = polygon[i][0], lngI = polygon[i][1];
-        const latJ = polygon[j][0], lngJ = polygon[j][1];
-        const intersect = ((lngI > lng) !== (lngJ > lng)) &&
-          (lat < (latJ - latI) * (lng - lngI) / (lngJ - lngI) + latI);
+        const xi = polygon[i][0], yi = polygon[i][1];
+        const xj = polygon[j][0], yj = polygon[j][1];
+        const intersect = ((yi > lng) !== (yj > lng)) &&
+          (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
         if (intersect) inside = !inside;
       }
       return inside;
@@ -187,7 +185,7 @@
 
       try {
         // Step 1: Nominatim — get OSM relation ID
-        const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&polygon_geojson=1`;
+        const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&polygon_geojson=0`;
         const nominatimRes = await fetch(nominatimUrl, {
           headers: { 'Accept-Language': 'en', 'User-Agent': 'GeoArchive/1.0' }
         });
@@ -205,25 +203,53 @@
 
         document.getElementById('locationLabel').innerHTML = '<span style="color:#0078a8">Loading boundary…</span>';
 
-        // Use GeoJSON polygon from Nominatim directly — no Overpass needed
-        const geo = place.geojson;
-        let coords = [];
-
-        if (geo && geo.type === 'Polygon') {
-          coords = geo.coordinates[0].map(p => [p[1], p[0]]); // [lng,lat] → [lat,lng]
-        } else if (geo && geo.type === 'MultiPolygon') {
-          // Flatten all rings
-          coords = geo.coordinates.flatMap(polygon => polygon[0].map(p => [p[1], p[0]]));
-        } else if (geo && geo.type === 'Point') {
-          // Fall back to bounding box for points
+        // Step 2: Overpass — get polygon for this OSM relation
+        let overpassQuery;
+        if (osmType === 'relation') {
+          overpassQuery = `[out:json];relation(${osmId});out geom;`;
+        } else if (osmType === 'way') {
+          overpassQuery = `[out:json];way(${osmId});out geom;`;
+        } else {
+          // node — no polygon, fall back to bounding box
           const bbox = place.boundingbox;
           const minLat = parseFloat(bbox[0]), maxLat = parseFloat(bbox[1]);
           const minLng = parseFloat(bbox[2]), maxLng = parseFloat(bbox[3]);
-          coords = [
+          locationPolygon = [
             [minLat, minLng], [maxLat, minLng],
-            [maxLat, maxLng], [minLat, maxLng],
-            [minLat, minLng]
+            [maxLat, maxLng], [minLat, maxLng]
           ];
+          const lbl1 = document.getElementById('locationLabel');
+          lbl1.className = 'active';
+          lbl1.innerHTML = `<a href="https://www.openstreetmap.org/${osmType}/${osmId}" target="_blank" rel="noopener">${displayName}</a> <span style="color:#94a3b8;font-weight:400">(OSM ${osmType} ${osmId}, approx.)</span>`;
+          clearBtn.style.display = 'block';
+          renderTable();
+          return;
+        }
+
+        const overpassUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`;
+        const overpassRes = await fetch(overpassUrl);
+        const overpassData = await overpassRes.json();
+
+        if (!overpassData.elements || !overpassData.elements.length) {
+          document.getElementById('locationLabel').innerHTML = '<span style="color:#ef4444">Boundary not found.</span>';
+          return;
+        }
+
+        // Extract polygon coordinates
+        const element = overpassData.elements[0];
+        let coords = [];
+
+        if (osmType === 'relation') {
+          // Collect ALL outer members and concatenate into one polygon
+          const outers = element.members?.filter(m => m.role === 'outer' && m.geometry) || [];
+          if (outers.length > 0) {
+            coords = outers.flatMap(m => m.geometry.map(p => [p.lat, p.lon]));
+          } else if (element.members) {
+            const first = element.members.find(m => m.geometry);
+            if (first?.geometry) coords = first.geometry.map(p => [p.lat, p.lon]);
+          }
+        } else if (osmType === 'way' && element.geometry) {
+          coords = element.geometry.map(p => [p.lat, p.lon]);
         }
 
         if (!coords.length) {
