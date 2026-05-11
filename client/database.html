@@ -79,34 +79,41 @@
 
         <!-- Location filter -->
         <div class="location-filter">
-          <div class="year-label">
-            Filter by location: <span id="locationLabel"><span class="location-label-world">World</span></span>
+          <div class="year-filter-label-row">
+            <div class="year-label" id="locationFilterLabel">
+              Filter by location: <span id="locationLabel"><span class="location-label-world">World</span></span>
+            </div>
+            <label class="cb-plain">
+              <input type="checkbox" id="nearestCheckbox">
+              <span>Sort by nearest to me</span>
+            </label>
           </div>
           <div class="location-filter-input-wrap">
-            <input type="text" id="locationInput" placeholder="Enter a town, country, etc." autocomplete="off">
+            <input type="text" id="locationInput" placeholder="e.g. Baltimore, Maryland" autocomplete="off">
             <button id="locationClear" class="location-clear" style="display:none" aria-label="Clear location filter">×</button>
           </div>
+          <button id="locationModeToggle" class="location-mode-toggle" title="Switch input mode" aria-label="Switch between name and OSM ID">
+            <span>▲</span>
+            <span>▼</span>
+          </button>
         </div>
 
-        <!-- Sort by nearest -->
-        <div class="filter-toggles" aria-label="Filter toggles">
-          <label class="cb-plain">
-            <input type="checkbox" id="nearestCheckbox">
-            <span>Sort by nearest to me</span>
-          </label>
-        </div>
-
-        <!-- Right side: show meta -->
+        <!-- Right side: uploader filter + KML export + show meta -->
         <div class="filter-right">
+          <div id="uploader-filter" class="uploader-filter" aria-hidden="true">
+            <div class="year-filter-label-row uploader-label-row">
+              <span class="year-label">Filter by uploader: <span id="uploaderLabel" class="uploader-label-value">All</span></span>
+            </div>
+            <input type="text" id="uploaderInput" placeholder="e.g. username" autocomplete="off">
+          </div>
+          <button id="kmlDownload" class="cb-plain" style="background:none;border:none;padding:0;">
+            ⬇ KML
+          </button>
           <div class="meta-anchor">
             <label class="cb-plain cb-meta">
               <input type="checkbox" id="showMeta">
               <span>Show meta</span>
             </label>
-            <!-- Popover-style uploader (does not affect layout) -->
-            <div id="uploader-filter" class="uploader-filter" aria-hidden="true">
-              <input type="text" id="uploaderInput" placeholder="Uploader" autocomplete="off">
-            </div>
           </div>
         </div>
 
@@ -147,6 +154,7 @@
  
     let initialUploaderApplied = false; 
     let allRecords = []; 
+    let currentFilteredRecords = [];
     let highlightApplied = false; 
     let userLocation = null; 
     let sortByNearest = false; 
@@ -171,6 +179,8 @@
       }
       return inside;
     }
+
+    let locationMode = 'name'; // 'name' or 'id'
 
     async function fetchLocationPolygon(query) {
       const clearBtn = document.getElementById('locationClear');
@@ -241,6 +251,69 @@
 
       } catch (err) {
         console.error('Location filter error:', err);
+        document.getElementById('locationLabel').innerHTML = '<span style="color:#ef4444">Error loading boundary.</span>';
+      }
+    }
+
+    async function fetchLocationById(osmId) {
+      const clearBtn = document.getElementById('locationClear');
+      const lbl = document.getElementById('locationLabel');
+
+      if (!osmId.trim()) {
+        locationPolygon = null;
+        lbl.className = '';
+        lbl.innerHTML = '';
+        clearBtn.style.display = 'none';
+        renderTable();
+        return;
+      }
+
+      lbl.className = '';
+      lbl.innerHTML = '<span style="color:#0078a8">Loading…</span>';
+
+      try {
+        const id = osmId.trim().replace(/^r/i, ''); // strip leading 'r' if user typed e.g. r162112
+        const nominatimUrl = `https://nominatim.openstreetmap.org/lookup?osm_ids=R${id}&format=json&polygon_geojson=1`;
+        const res = await fetch(nominatimUrl, {
+          headers: { 'Accept-Language': 'en', 'User-Agent': 'GeoArchive/1.0' }
+        });
+        const data = await res.json();
+
+        if (!data.length) {
+          lbl.innerHTML = '<span style="color:#ef4444">ID not found.</span>';
+          return;
+        }
+
+        const place = data[0];
+        const displayName = place.display_name.split(',').slice(0, 2).join(',');
+        const geo = place.geojson;
+        let coords = [];
+
+        if (geo && geo.type === 'Polygon') {
+          coords = geo.coordinates[0].map(p => [p[1], p[0]]);
+        } else if (geo && geo.type === 'MultiPolygon') {
+          coords = geo.coordinates.flatMap(polygon => polygon[0].map(p => [p[1], p[0]]));
+        } else if (geo && geo.type === 'Point') {
+          const bbox = place.boundingbox;
+          const minLat = parseFloat(bbox[0]), maxLat = parseFloat(bbox[1]);
+          const minLng = parseFloat(bbox[2]), maxLng = parseFloat(bbox[3]);
+          coords = [[minLat,minLng],[maxLat,minLng],[maxLat,maxLng],[minLat,maxLng],[minLat,minLng]];
+        }
+
+        if (!coords.length) {
+          lbl.innerHTML = '<span style="color:#ef4444">Could not load boundary.</span>';
+          return;
+        }
+
+        locationPolygon = coords;
+        window._debugPolygon = coords;
+        lbl.className = 'active';
+        lbl.innerHTML = `<a href="https://www.openstreetmap.org/relation/${id}" target="_blank" rel="noopener">${displayName}</a> <span style="color:#94a3b8;font-weight:400">(OSM relation ${id})</span>`;
+        clearBtn.style.display = 'block';
+        renderTable();
+
+      } catch (err) {
+        console.error('Location ID filter error:', err);
         document.getElementById('locationLabel').innerHTML = '<span style="color:#ef4444">Error loading boundary.</span>';
       }
     }
@@ -577,6 +650,8 @@
           return pointInPolygon(r.lat, r.lng, locationPolygon);
         });
       }
+
+      currentFilteredRecords = filtered;
  
       filtered.forEach(record => { 
         const { 
@@ -712,6 +787,34 @@
       initialUploaderApplied = true; 
     } 
 
+    function downloadKML() {
+      const records = currentFilteredRecords.filter(r =>
+        typeof r.lat === 'number' && typeof r.lng === 'number'
+      );
+      if (!records.length) {
+        alert('No records with coordinates match the current filters.');
+        return;
+      }
+      const esc = s => (s || '').toString()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const placemarks = records.map(r => {
+        let dateStr = r.year ? (r.estimated ? `c. ${r.year}` : `${r.year}`) : 'Undated';
+        const desc = [
+          dateStr,
+          r.source     ? `Source: ${r.source}`           : null,
+          r.photographer ? `Photographer: ${r.photographer}` : null,
+        ].filter(Boolean).join('&#10;');
+        return `    <Placemark>\n      <name>${esc(r.caption || `Record ${r.id}`)}</name>\n      <description>${esc(desc)}</description>\n      <Point><coordinates>${r.lng},${r.lat},0</coordinates></Point>\n    </Placemark>`;
+      }).join('\n');
+      const kml = `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n  <Document>\n    <name>GeoArchive Export</name>\n${placemarks}\n  </Document>\n</kml>`;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' }));
+      a.download = 'geoarchive-export.kml';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
     // Rest of the code stays the same...
     document.addEventListener('DOMContentLoaded', () => { 
       loadApprovedRecords(); 
@@ -739,7 +842,9 @@
       const rangeInput = document.getElementById('yearRange'); 
       const rangeLabel = document.getElementById('rangeLabel'); 
       const includeUndated = document.getElementById('includeUndated'); 
-      const nearestCheckbox = document.getElementById('nearestCheckbox'); 
+      const nearestCheckbox = document.getElementById('nearestCheckbox');
+
+      document.getElementById('kmlDownload').addEventListener('click', downloadKML);
  
       rangeInput.addEventListener('input', () => { 
         const val = parseInt(rangeInput.value, 10); 
@@ -799,13 +904,18 @@
         } else { 
           uploaderFilter.classList.remove('show'); 
           uploaderFilter.setAttribute('aria-hidden', 'true'); 
-          uploaderInput.value = ""; 
+          uploaderInput.value = "";
+          const lbl = document.getElementById('uploaderLabel');
+          if (lbl) lbl.textContent = 'All';
         } 
  
         renderTable(); 
       }); 
  
-      uploaderInput?.addEventListener('input', () => { 
+      uploaderInput?.addEventListener('input', () => {
+        const val = uploaderInput.value.trim();
+        const lbl = document.getElementById('uploaderLabel');
+        if (lbl) lbl.textContent = val || 'All';
         renderTable(); 
       }); 
  
@@ -844,23 +954,56 @@
         const val = e.target.value.trim();
         if (!val) {
           locationPolygon = null;
-          const lbl3 = document.getElementById('locationLabel');
-          lbl3.className = '';
-          lbl3.innerHTML = '<span class="location-label-world">World</span>';
+          const lbl = document.getElementById('locationLabel');
+          lbl.className = '';
+          if (locationMode === 'name') {
+            lbl.innerHTML = '<span class="location-label-world">World</span>';
+          } else {
+            lbl.innerHTML = '';
+          }
           document.getElementById('locationClear').style.display = 'none';
           renderTable();
           return;
         }
-        locationDebounce = setTimeout(() => fetchLocationPolygon(val), 600);
+        if (locationMode === 'name') {
+          locationDebounce = setTimeout(() => fetchLocationPolygon(val), 600);
+        } else {
+          locationDebounce = setTimeout(() => fetchLocationById(val), 600);
+        }
       });
 
       document.getElementById('locationClear').addEventListener('click', () => {
         document.getElementById('locationInput').value = '';
         locationPolygon = null;
-        const lbl4 = document.getElementById('locationLabel');
-        lbl4.className = '';
-        lbl4.innerHTML = '<span class="location-label-world">World</span>';
+        const lbl = document.getElementById('locationLabel');
+        lbl.className = '';
+        if (locationMode === 'name') {
+          lbl.innerHTML = '<span class="location-label-world">World</span>';
+        } else {
+          lbl.innerHTML = '';
+        }
         document.getElementById('locationClear').style.display = 'none';
+        renderTable();
+      });
+
+      document.getElementById('locationModeToggle').addEventListener('click', () => {
+        locationPolygon = null;
+        document.getElementById('locationInput').value = '';
+        document.getElementById('locationClear').style.display = 'none';
+        const lbl = document.getElementById('locationLabel');
+        lbl.className = '';
+        const filterLabel = document.getElementById('locationFilterLabel');
+        const input = document.getElementById('locationInput');
+
+        if (locationMode === 'name') {
+          locationMode = 'id';
+          filterLabel.innerHTML = 'Filter by OSM area ID: <span id="locationLabel"></span>';
+          input.placeholder = 'e.g. 133345';
+        } else {
+          locationMode = 'name';
+          filterLabel.innerHTML = 'Filter by location: <span id="locationLabel"><span class="location-label-world">World</span></span>';
+          input.placeholder = 'e.g. Baltimore, Maryland';
+        }
         renderTable();
       });
  

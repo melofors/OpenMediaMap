@@ -1554,7 +1554,7 @@ td.uploader-column {
 .filter-bar {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px 20px;
   margin: 14px 0 12px;
   padding: 0;
@@ -1627,10 +1627,16 @@ td.uploader-column {
 /* Location filter */
 .location-filter {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 0 1 260px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 0 1 300px;
   min-width: 0;
+  align-items: flex-end;
+}
+
+.location-filter > .year-filter-label-row {
+  flex: 0 0 100%;
 }
 
 .location-label-world {
@@ -1664,45 +1670,47 @@ td.uploader-column {
   position: relative;
   display: flex;
   align-items: center;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .location-filter-input-wrap input {
   width: 100%;
-  height: var(--filter-pill-h);
-  padding: 0 28px 0 10px;
-  font-size: 13px;
-  font-weight: 600;
+  height: 28px;
+  padding: 0 24px 0 8px;
+  font-size: 12px;
+  font-weight: 400;
   color: #0f172a;
-  border-radius: 10px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(248, 250, 252, 0.55);
+  border-radius: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  background: rgba(248, 250, 252, 0.7);
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .location-filter-input-wrap input:hover {
-  background: rgba(248, 250, 252, 0.9);
-  border-color: rgba(0, 120, 168, 0.22);
+  border-color: rgba(15, 23, 42, 0.25);
+  background: #fff;
 }
 
 .location-filter-input-wrap input:focus {
-  background: rgba(255, 255, 255, 0.92);
-  border-color: rgba(0, 120, 168, 0.65);
-  box-shadow: 0 0 0 4px rgba(0, 120, 168, 0.15);
+  border-color: rgba(15, 23, 42, 0.3);
+  background: #fff;
+  outline: none;
 }
 
 .location-filter-input-wrap input::placeholder {
-  color: rgba(15, 23, 42, 0.48);
+  color: rgba(15, 23, 42, 0.38);
   font-weight: 400;
 }
 
 .location-clear {
   position: absolute;
-  right: 6px;
+  right: 5px;
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: 14px;
   color: #94a3b8;
   cursor: pointer;
   padding: 0 2px;
@@ -1710,6 +1718,29 @@ td.uploader-column {
 }
 
 .location-clear:hover { color: #0f172a; }
+
+.location-mode-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 0 2px;
+  color: #94a3b8;
+  flex-shrink: 0;
+  height: 28px;
+}
+
+.location-mode-toggle span {
+  font-size: 9px;
+  line-height: 0.9;
+  display: block;
+}
+
+.location-mode-toggle:hover { color: #0f172a; }
 
 /* Toggle cluster */
 .filter-toggles {
@@ -1738,7 +1769,7 @@ td.uploader-column {
   -webkit-tap-highlight-color: transparent;
   background: rgba(248, 250, 252, 0.55);
   border: 1px solid rgba(15, 23, 42, 0.06);
-  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
   width: auto;
   min-width: 0;
 }
@@ -1752,12 +1783,7 @@ td.uploader-column {
 
 .cb:hover {
   background: rgba(248, 250, 252, 0.9);
-  border-color: rgba(0, 120, 168, 0.22);
-}
-
-.cb:focus-within {
-  box-shadow: 0 0 0 4px rgba(0, 120, 168, 0.16);
-  border-color: rgba(0, 120, 168, 0.35);
+  border-color: rgba(15, 23, 42, 0.12);
 }
 
 .cb-meta { white-space: nowrap; }
@@ -1765,51 +1791,62 @@ td.uploader-column {
 .filter-right {
   position: relative;
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 10px;
   flex: 0 0 auto;
   white-space: nowrap;
+  margin-left: auto;
 }
 
-/* Uploader popover */
+/* Uploader filter — inline flow, hidden until Show meta is checked */
 .uploader-filter {
-  position: absolute;
-  right: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%);
   display: none;
-  z-index: 20;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.uploader-filter.show { display: block; }
+.uploader-filter.show {
+  display: flex;
+}
+
+.uploader-label-row {
+  justify-content: flex-start;
+}
+
+.uploader-label-value {
+  font-weight: 800;
+  color: #0078a8;
+}
 
 .uploader-filter input {
-  width: var(--uploader-pill-w);
-  height: var(--filter-pill-h);
-  padding: 0 10px;
-  font-size: 13px;
-  font-weight: 600;
+  height: 28px;
+  width: 160px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 400;
   color: #0f172a;
-  border-radius: 10px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(248, 250, 252, 0.55);
+  border-radius: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  background: rgba(248, 250, 252, 0.7);
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .uploader-filter input:hover {
-  background: rgba(248, 250, 252, 0.9);
-  border-color: rgba(0, 120, 168, 0.22);
+  border-color: rgba(15, 23, 42, 0.25);
+  background: #fff;
 }
 
 .uploader-filter input:focus {
-  background: rgba(255, 255, 255, 0.92);
-  border-color: rgba(0, 120, 168, 0.65);
-  box-shadow: 0 0 0 4px rgba(0, 120, 168, 0.15);
+  border-color: rgba(15, 23, 42, 0.3);
+  background: #fff;
 }
 
-.uploader-filter input::placeholder { color: rgba(15, 23, 42, 0.48); }
+.uploader-filter input::placeholder {
+  color: rgba(15, 23, 42, 0.38);
+  font-weight: 400;
+}
 
 @media (max-width: 860px) {
   .filter-right {
@@ -1818,15 +1855,11 @@ td.uploader-column {
     flex-wrap: wrap;
     white-space: normal;
   }
+}
 
-  .uploader-filter {
-    right: auto;
-    left: 0;
-    top: calc(100% + 8px);
-    transform: none;
-  }
-
-  .uploader-filter input { width: min(var(--uploader-pill-w), 100%); }
+.meta-anchor {
+  position: relative;
+  display: flex;
 }
 
 /* ===== MODAL SYSTEM ===== */
