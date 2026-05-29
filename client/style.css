@@ -2068,14 +2068,15 @@ td.uploader-column {
 
 /* CONFIDENCE BADGE */
 .confidence-badge {
-  display: inline-block;
-  margin-top: 5px;
+  display: block;
+  margin-top: 6px;
   padding: 2px 6px;
   border-radius: 5px;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.4;
+  width: fit-content;
 }
 
 .confidence-exact  { background: #dcfce7; color: #166534; }  /* green  — pinpoint */
@@ -2183,9 +2184,11 @@ td.uploader-column {
    ========================= */
 
 .actions-column {
-  width: 120px;
-  text-align: left;            /* flush left under "A" in Actions header */
-  padding-left: 0 !important;  /* remove any extra cell padding */
+  width: 100px;
+  text-align: left;
+  padding-left: 0 !important;
+  white-space: nowrap;
+  font-size: 12.5px;
 }
 
 .db-btn {
@@ -3792,4 +3795,4 @@ body.database #historyModal .modal-content::-webkit-scrollbar-thumb:hover {
 
   margin: 0 !important;              /* ✅ no bottom gap */
   object-fit: cover !important;
-}               
+}
