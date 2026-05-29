@@ -1635,11 +1635,6 @@
     return `${latNum.toFixed(5)}, ${lngNum.toFixed(5)}`;
   }
 
-  const CONFIDENCE_LABELS_HISTORY = { exact: 'Exact (within 5m)', high: 'Within 30m (high)', mid: 'Within 150m (mid)', low: 'Within 350m (low)' };
-  function formatConfidence(c) {
-    return c ? (CONFIDENCE_LABELS_HISTORY[c] || c) : 'Not set';
-  }
-
   function buildSafeUserLink(username) {
     // Validate username format
     const u = String(username ?? '');
@@ -1713,7 +1708,7 @@
     }
 
     // If we have a previous revision, show diffs. Otherwise show plain values
-    let captionHtml, sourceHtml, photographerHtml, dateHtml, coordsHtml, notesHtml, confidenceHtml;
+    let captionHtml, sourceHtml, photographerHtml, dateHtml, coordsHtml, notesHtml;
     
     if (previousRevision) {
       captionHtml = compareValues(previousRevision.caption, revision.caption);
@@ -1729,7 +1724,6 @@
       coordsHtml = compareValues(prevCoords, currCoords);
       
       notesHtml = compareValues(previousRevision.notes, revision.notes);
-      confidenceHtml = compareValues(formatConfidence(previousRevision.location_confidence), formatConfidence(revision.location_confidence));
     } else {
       // No previous revision - just show current values
       captionHtml = escapeHtml(revision.caption || 'N/A');
@@ -1738,7 +1732,6 @@
       dateHtml = escapeHtml(formattedDate);
       coordsHtml = coords;
       notesHtml = escapeHtml(revision.notes || '');
-      confidenceHtml = escapeHtml(formatConfidence(revision.location_confidence));
     }
 
     return `
@@ -1781,11 +1774,6 @@
           <div class="history-field">
             <span class="history-field-label">Coordinates:</span>
             <span class="history-field-value">${coordsHtml}</span>
-          </div>
-
-          <div class="history-field">
-            <span class="history-field-label">Confidence:</span>
-            <span class="history-field-value">${confidenceHtml}</span>
           </div>
 
           ${revision.notes || (previousRevision && previousRevision.notes) ? `
@@ -1882,8 +1870,7 @@
           estimated: currentRecord.estimated,
           lat: currentRecord.lat,
           lng: currentRecord.lng,
-          notes: currentRecord.notes,
-          location_confidence: currentRecord.location_confidence || null
+          notes: currentRecord.notes
         };
         
         // ALWAYS compare current with the original (revision_number=0)
